@@ -1,0 +1,12 @@
+name: "isss608-group-website"
+title: "VAST 2022 Group Project"
+description: |
+  VAST 2022 Group Project
+output_dir: "_site"
+navbar:
+  right:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+output: distill::distill_article
