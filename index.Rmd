@@ -1,12 +1,15 @@
 ---
-title: "VAST 2022 Group Project"
+title: "ISSS608 Group Project"
 description: |
-  Welcome to the website. I hope you enjoy it!
+  Welcome to the team's website on works done for ISSS608 Group Project: [VAST Challenge 2022](https://vast-challenge.github.io/2022/) Challenge 3 Economic! The project team consists of: Leslie Long Nu, Raunak Kapur and Raveena Chakrapani. 
+  
+  We hope you enjoy our work!
+  
 site: distill::distill_website
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE)
 
 # Learn more about creating websites with Distill at:
 # https://rstudio.github.io/distill/website.html

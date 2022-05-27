@@ -1,0 +1,17 @@
+---
+title: "Project Proposal"
+author: 
+  - name: Leslie Long Nu
+    url: https://www.linkedin.com/in/leslielongnu/
+  - name: Raunak Kapur
+    url: https://www.linkedin.com/in/raunak-kapur-520b47141/
+  - name: Raveena Chakrapani
+    url: https://www.linkedin.com/in/raveena-chakrapani-444a60174/
+date: '2022-05-27'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+```
+

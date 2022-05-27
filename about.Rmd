@@ -1,10 +1,13 @@
 ---
 title: "About this site"
 description: |
-  Some additional details about the website
+  This site contains works done for ISSS608 Visual Analytics Group Project: [VAST Challenge 2022](https://vast-challenge.github.io/2022/) Challeng 3 Economic. 
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(message = FALSE, 
+                      warning = FALSE,
+                      error = FALSE, 
+                      echo = FALSE)
 ```
 
