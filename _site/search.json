@@ -6,7 +6,7 @@
       "description": "This site contains works done for ISSS608 Visual Analytics Group Project: [VAST Challenge 2022](https://vast-challenge.github.io/2022/) Challeng 3 Economic. ",
       "author": [],
       "contents": "\n\n\n\n",
-      "last_modified": "2022-05-28T01:17:55+08:00"
+      "last_modified": "2022-05-28T14:44:27+08:00"
     },
     {
       "path": "index.html",
@@ -14,11 +14,12 @@
       "description": "Welcome to the team's website on works done for ISSS608 Group Project: [VAST Challenge 2022](https://vast-challenge.github.io/2022/) Challenge 3 Economic! The project team consists of: Leslie Long Nu, Raunak Kapur and Raveena Chakrapani. \n\nWe hope you enjoy our work!\n",
       "author": [],
       "contents": "\n\n\n\n",
-      "last_modified": "2022-05-28T01:18:59+08:00"
+      "last_modified": "2022-05-28T14:44:28+08:00"
     },
     {
       "path": "proposal.html",
       "title": "Project Proposal",
+      "description": "This page contains the Project Proposal.\n",
       "author": [
         {
           "name": "Leslie Long Nu",
@@ -34,8 +35,8 @@
         }
       ],
       "date": "2022-05-27",
-      "contents": "\n\n\n\n\n\n\n\n\nVAST Challenge 2022 Economic\nProject Proposal\n\n\nhome\nAbout\n☰\n\n\n  \n    \n      \n        \n        \n        \n      \n      \n    \n    \n      \n  Project Proposal\n\n      \n  home\n\n\n  About\n\n      \n  \n\n\n\n\n\n\nProject Proposal\nLeslie Long Nu\nRaunak Kapur\nRaveena Chakrapani\n2022-05-27\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n// add bootstrap table styles to pandoc tables\nfunction bootstrapStylePandocTables() {\n  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');\n}\n$(document).ready(function () {\n  bootstrapStylePandocTables();\n});\n\n\n\n$(document).ready(function () {\n  window.buildTabsets(\"TOC\");\n});\n\n$(document).ready(function () {\n  $('.tabset-dropdown > .nav-tabs > li').click(function () {\n    $(this).parent().toggleClass('nav-tabs-open');\n  });\n});\n\n  (function () {\n    var script = document.createElement(\"script\");\n    script.type = \"text/javascript\";\n    script.src  = \"https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML\";\n    document.getElementsByTagName(\"head\")[0].appendChild(script);\n  })();\n",
-      "last_modified": "2022-05-28T01:17:56+08:00"
+      "contents": "\n\nContents\nMotivation\nProblem Statements\nApproach\nEarly Prototypes\n\nMotivation\nProblem Statements\nApproach\nEarly Prototypes\n\n\n\n",
+      "last_modified": "2022-05-28T14:49:03+08:00"
     }
   ],
   "collections": []
