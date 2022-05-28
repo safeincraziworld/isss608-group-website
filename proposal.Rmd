@@ -54,14 +54,31 @@ Alternative approach of deriving balance difference before and after restaurants
 
 ## Question 2
 
+One question which rides in the minds of every reader who resides or does not reside in a city is - How expensive or affordable is the cost of living here? Can a resident residing here build up a good bank balance over the years?
+
+Keeping the sample of 1000 participants in mind, this segment will help study the financial health of each of the participants.
+
+The <i>FinancialJournal.csv</i> helps understand the expense in categories such as Food, Recreation, Shelter and Earnings such as Wage. (Assumption : All positive values corresponds to credit and negative ones are debited)
+
+<i>Trellis Display</i> can be used to understand the cost of living of each of the participants. This will also give us an idea on the living index of the city over the months to see if the living standard increased over the months which may have motivated participants to leave the city.
+
+The sample collected consists of diverse participants. Participants can be partitioned based on the educational qualifications, Number of Household members, Interest groups (A-H), Age groups, etc. We can use such partitions to our favour to understand the similarity between groups. 
+
+Since we are dealing with our data in monthly format, <i>Column Graph</i> can help us understand the expenses incurred by these groups. 
+
+<i>Ridge plot</i> can help us understand the distribution in the expenses over months during peak and off peak seasons
+
+To understand the earning pattern of the participants, a <i>Lorenz curve</i> can help us understand if the rich gets richer. 
+
+With the help of Interactive/Coordinated plots (Example: Scattered plot), we can also understand if people who earn more, spend more and if we see any relation with joviality. 
+
 ## Question 3
 
 ### Financial health of the employers
 
 By merging *jobs.csv* and *employers.csv* by employerId, we can find out which employer pays more and thereby we can arrive to the conclusion of financial status of employers. 
 
-Also by deriving Which employers have the record of most numbers of employees switching jobs, we'll understand their worskaspace culture and how likely the employer(company) may be referred to ?  
-
+Also by deriving Which employers have the record of most numbers of employees switching jobs, we'll understand their workspace culture and how likely the employer(company) may be referred to ?  
 
 ### Employment patterns 
 
