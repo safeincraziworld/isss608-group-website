@@ -35,12 +35,26 @@ Following are the questions we aim to answer, referencing from VAST Challenge 20
 
 # Approach 
 ## Question 1
+It is observed from the datasets provided by [VAST Challenge 2022](https://vast-challenge.github.io/2022/) that there are two types of businesses present in Engagement, Ohio USA, namely:
+
+* Restaurants; 
+* Pubs
+
+They will be evaluated based on:
+
+* Frequency and number of participants' visits;
+* Revenue (participants' spending)
+
+According to the dataset descriptions provided by VAST Challenge, all restaurants have a Prix Fixe food cost for participants to dine in and all pubs have a hourly cost to visit the pub. Therefore, assuming all visits to restaurants are for dinning, restaurants' revenue will be calculated by number of visits times Prix Fixe food cost. Similarly, pubs' revenue will be calculated by duration of visits times hourly cost of visits.  
+
+Alternative approach of deriving balance difference before and after restaurants and pubs visits as spending is considered but not preferred as balance differences are inconsistent and could be due to unknown reasons.   
 
 ## Question 2
 
 ## Question 3
 
 # Early Prototypes
+
 
 
 
