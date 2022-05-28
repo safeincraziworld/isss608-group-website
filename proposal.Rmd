@@ -20,7 +20,10 @@ knitr::opts_chunk$set(message = FALSE)
 ```
 
 # Motivation
-Inspired by Prof Kam, this group project aims to make use of interactive visualizations to answer questions from [VAST Challenge 2022](https://vast-challenge.github.io/2022/) Challenge 3 to find out the Economic status of the City of Engagement, Ohio USA. 
+
+In general, we have Several commercial software packages in market to draw data and their summaries. However,ideally, such tools should be open source, freely available and allow contributions or
+modifications by users. Inspired by Prof Kam, with the acquired coding skills and understanding of data ,this group project aims to create such flexible website by making use of interactive visualizations to answer questions from [VAST Challenge 2022](https://vast-challenge.github.io/2022/) Challenge 3 to find out the Economic status of the City of Engagement, Ohio USA.
+ 
 
 # Problem Statements 
 Following are the questions we aim to answer, referencing from VAST Challenge 2022 Challenge 3 questions: 
