@@ -18,7 +18,7 @@
     },
     {
       "path": "proposal.html",
-      "title": "Project Proposal",
+      "title": "Team 3 Project Proposal",
       "description": "This page contains the Project Proposal.\n",
       "author": [
         {
@@ -35,8 +35,8 @@
         }
       ],
       "date": "2022-05-27",
-      "contents": "\n\nContents\nMotivation\nProblem Statements\nApproach\nEarly Prototypes\n\nMotivation\nProblem Statements\nApproach\nEarly Prototypes\n\n\n\n",
-      "last_modified": "2022-05-28T14:49:03+08:00"
+      "contents": "\n\nContents\nMotivation\nProblem Statements\nApproach\nQuestion 1\nQuestion 2\nQuestion 3\n\nEarly Prototypes\n\nMotivation\nInspired by Prof Kam, this group project aims to make use of\ninteractive visualizations to answer questions from VAST Challenge 2022\nChallenge 3 to find out the Economic status of the City of Engagement,\nOhio USA.\nProblem Statements\nFollowing are the questions we aim to answer, referencing from VAST\nChallenge 2022 Challenge 3 questions:\nChallenge 3: Economic considers the financial\nhealth of the city. Over time, are businesses growing or shrinking? How\nare people changing jobs? Are standards of living improving or declining\nover time?\nConsider the financial status of Engagement’s businesses and\nresidents, and use visual analytic techniques to address these\nquestions.\nOver the period covered by the dataset, which businesses appear to\nbe more prosperous? Which appear to be struggling? Describe your\nrationale for your answers. Limit your response to 10 images and 500\nwords.\nHow does the financial health of the residents change over the\nperiod covered by the dataset? How do wages compare to the overall cost\nof living in Engagement? Are there groups that appear to exhibit similar\npatterns? Describe your rationale for your answers. Limit your response\nto 10 images and 500 words.\nDescribe the health of the various employers within the city limits.\nWhat employment patterns do you observe? Do you notice any areas of\nparticularly high or low turnover? Limit your response to 10 images and\n500 words.\nApproach\nQuestion 1\nQuestion 2\nQuestion 3\nEarly Prototypes\n\n\n\n",
+      "last_modified": "2022-05-28T14:59:31+08:00"
     }
   ],
   "collections": []
