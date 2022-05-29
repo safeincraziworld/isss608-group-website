@@ -90,8 +90,6 @@ Also, with the help of *jobs.csv* file, let's try to find if there is any correl
 
 To analyse the turnover, let us have a close look on *TravelJournal.csv*. Once the data wrangling (filtering out the purpose of Work/Home commute and grouping by participantId, travelEndLocation) is performed, we are not just finding out the overall turnover percentage rate but also with the help of apprpriate visualisation we are able to find out the exact participants who have disappeared from local job market, and who have partially employed by examining the no. of rows (n).
 
-
-
 # Early Prototypes
 
 
