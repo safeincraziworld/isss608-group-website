@@ -92,8 +92,50 @@ To analyse the turnover, let us have a close look on *TravelJournal.csv*. Once t
 
 # Early Prototypes
 
+#### Understanding the cost of living of Participants
+
+Graph: Line chart in Trellis Display
+<img src="Trellis.png">
+
+Rationale: It will help us to understand the cost of living of each and every participant and given the functionality of the Trelliscope, we can add additional filters such as educational background and age group to understand the trends amongst such groups
+
+#### Comparing and relating the earning and expenditure trends
+
+Graph: Scatter plot for each of the components, designed in a coordinated way 
+
+<img src="CoordinatedGraph.png">
+
+Rationale: We would be able to highlight and deep dive on unusual trends and the table will help us understand the attributes.
+
+#### Finding out the similarity between groups
+
+Graph: Column graph depicting the expenditure patterns.
+
+<img src="download.gif">
+
+Rationale: By creating an animated graph seperated between months, we can observe the rise/fall in the expenditure pattern between groups
 
 
+#### Inequality amongst participants
 
+Graph: Lorenz curve
 
+<img src="Lorenz.png">
 
+Rationale: A Lorenz curve is a graphical representation of the distribution of income or wealth within a population.
+
+#### The rise/fall of available balance
+
+Graph: Slope Graph
+
+<img src="SlopeGraph.png">
+
+Rationale: This will help us compare between participants and depict a graphical representation of the financial health over the months
+
+#### Understanding the opening and closing monthly expense
+
+Graph: Candle Stick
+
+<img src="CandleStick.png">
+
+Rationale: Like the opening and closing figures of stock market, we can notice the same here with the available balance and understand the peak months when the expense has been ceiling high.
