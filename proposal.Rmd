@@ -91,6 +91,19 @@ Also, with the help of *jobs.csv* file, let's try to find if there is any correl
 To analyse the turnover, let us have a close look on *TravelJournal.csv*. Once the data wrangling (filtering out the purpose of Work/Home commute and grouping by participantId, travelEndLocation) is performed, we are not just finding out the overall turnover percentage rate but also with the help of apprpriate visualisation we are able to find out the exact participants who have disappeared from local job market, and who have partially employed by examining the no. of rows (n).
 
 # Early Prototypes
+#### Reveal the prosperity of the restaurants and pubs
+
+We propose to use two trellis plots on restaurants and pubs' number of customer visits to illustrate the prosperity of the restaurants and pubs' business. The nature of the trellis plot also allows users to sort and filter the visualization based on different conditions. 
+
+![Restaurant Customer Visit Trellis Plot](pictures/restaurant trellis.png)
+
+![Pubs Customer Visit Trellis Plot](pictures/pubs trellis.png)
+
+For example, users can filter by price of the pubs' hourly cost and sort the trellis plot by descending order of the largest number of visits, to find out the most popular pubs in the given price range. 
+
+![Filter Pubs by Hourly Cost](pictures/filter.png)
+
+![Sort Pubs by Highest Number of Costomer Visits](pictures/sort.png)
 
 #### Understanding the cost of living of Participants
 

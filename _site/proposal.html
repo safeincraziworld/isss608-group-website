@@ -50,16 +50,17 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  { color: #00769e; background-color: #f1f3f5; }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
+code span { color: #00769e; } /* Normal */
 code span.al { color: #ad0000; } /* Alert */
 code span.an { color: #5e5e5e; } /* Annotation */
-code span.at { } /* Attribute */
+code span.at { color: #657422; } /* Attribute */
 code span.bn { color: #ad0000; } /* BaseN */
 code span.bu { } /* BuiltIn */
-code span.cf { color: #007ba5; } /* ControlFlow */
+code span.cf { color: #00769e; } /* ControlFlow */
 code span.ch { color: #20794d; } /* Char */
 code span.cn { color: #8f5902; } /* Constant */
 code span.co { color: #5e5e5e; } /* Comment */
@@ -73,9 +74,9 @@ code span.fl { color: #ad0000; } /* Float */
 code span.fu { color: #4758ab; } /* Function */
 code span.im { } /* Import */
 code span.in { color: #5e5e5e; } /* Information */
-code span.kw { color: #007ba5; } /* Keyword */
+code span.kw { color: #00769e; } /* Keyword */
 code span.op { color: #5e5e5e; } /* Operator */
-code span.ot { color: #007ba5; } /* Other */
+code span.ot { color: #00769e; } /* Other */
 code span.pp { color: #ad0000; } /* Preprocessor */
 code span.sc { color: #5e5e5e; } /* SpecialChar */
 code span.ss { color: #20794d; } /* SpecialString */
@@ -1869,6 +1870,12 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
       // hoverable references
       $('span.citation[data-cites]').each(function() {
+        if ($(this).children()[0].nodeName == "D-FOOTNOTE") {
+          var fn = $(this).children()[0]
+          $(this).html(fn.shadowRoot.querySelector("sup"))
+          $(this).id = fn.id
+          fn.remove()
+        }
         var refs = $(this).attr('data-cites').split(" ");
         var refHtml = refs.map(function(ref) {
           return "<p>" + $('#ref-' + ref).html() + "</p>";
@@ -2043,7 +2050,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </script>
 
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
+  <script src="site_libs/header-attrs-2.14.2/header-attrs.js"></script>
   <script src="site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2093,11 +2100,16 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 
 <div class="d-byline">
-  Leslie Long Nu <a href="https://www.linkedin.com/in/leslielongnu/" class="uri">https://www.linkedin.com/in/leslielongnu/</a> 
+  Leslie Long Nu <a href="https://www.linkedin.com/in/leslielongnu/"
+class="uri">https://www.linkedin.com/in/leslielongnu/</a> 
   
-,   Raunak Kapur <a href="https://www.linkedin.com/in/raunak-kapur-520b47141/" class="uri">https://www.linkedin.com/in/raunak-kapur-520b47141/</a> 
+,   Raunak Kapur <a
+href="https://www.linkedin.com/in/raunak-kapur-520b47141/"
+class="uri">https://www.linkedin.com/in/raunak-kapur-520b47141/</a> 
   
-,   Raveena Chakrapani <a href="https://www.linkedin.com/in/raveena-chakrapani-444a60174/" class="uri">https://www.linkedin.com/in/raveena-chakrapani-444a60174/</a> 
+,   Raveena Chakrapani <a
+href="https://www.linkedin.com/in/raveena-chakrapani-444a60174/"
+class="uri">https://www.linkedin.com/in/raveena-chakrapani-444a60174/</a> 
   
 <br/>2022-05-27
 </div>
@@ -2115,7 +2127,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <li><a href="#question-2">Question 2</a></li>
 <li><a href="#question-3">Question 3</a>
 <ul>
-<li><a href="#financial-health-of-the-employers">Financial health of the employers</a></li>
+<li><a href="#financial-health-of-the-employers">Financial health of the
+employers</a></li>
 <li><a href="#employment-patterns">Employment patterns</a></li>
 <li><a href="#turnover-analysis">Turnover Analysis</a></li>
 </ul></li>
@@ -2125,19 +2138,46 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </nav>
 </div>
 <h1 id="motivation">Motivation</h1>
-<p>In general, we have Several commercial software packages in market to draw data and their summaries. However,ideally, such tools should be open source, freely available and allow contributions or modifications by users. Inspired by Prof Kam, with the acquired coding skills and understanding of data ,this group project aims to create such flexible website by making use of interactive visualizations to answer questions from <a href="https://vast-challenge.github.io/2022/">VAST Challenge 2022</a> Challenge 3 to find out the Economic status of the City of Engagement, Ohio USA.</p>
+<p>In general, we have Several commercial software packages in market to
+draw data and their summaries. However,ideally, such tools should be
+open source, freely available and allow contributions or modifications
+by users. Inspired by Prof Kam, with the acquired coding skills and
+understanding of data ,this group project aims to create such flexible
+website by making use of interactive visualizations to answer questions
+from <a href="https://vast-challenge.github.io/2022/">VAST Challenge
+2022</a> Challenge 3 to find out the Economic status of the City of
+Engagement, Ohio USA.</p>
 <h1 id="problem-statements">Problem Statements</h1>
-<p>Following are the questions we aim to answer, referencing from VAST Challenge 2022 Challenge 3 questions:</p>
-<p><em><strong>Challenge 3: Economic</strong> considers the financial health of the city. Over time, are businesses growing or shrinking? How are people changing jobs? Are standards of living improving or declining over time?</em></p>
-<p><em>Consider the financial status of Engagement’s businesses and residents, and use visual analytic techniques to address these questions.</em></p>
+<p>Following are the questions we aim to answer, referencing from VAST
+Challenge 2022 Challenge 3 questions:</p>
+<p><em><strong>Challenge 3: Economic</strong> considers the financial
+health of the city. Over time, are businesses growing or shrinking? How
+are people changing jobs? Are standards of living improving or declining
+over time?</em></p>
+<p><em>Consider the financial status of Engagement’s businesses and
+residents, and use visual analytic techniques to address these
+questions.</em></p>
 <ol type="1">
-<li>Over the period covered by the dataset, which businesses appear to be more prosperous? Which appear to be struggling? Describe your rationale for your answers. Limit your response to 10 images and 500 words.</li>
-<li>How does the financial health of the residents change over the period covered by the dataset? How do wages compare to the overall cost of living in Engagement? Are there groups that appear to exhibit similar patterns? Describe your rationale for your answers. Limit your response to 10 images and 500 words.</li>
-<li>Describe the health of the various employers within the city limits. What employment patterns do you observe? Do you notice any areas of particularly high or low turnover? Limit your response to 10 images and 500 words.</li>
+<li>Over the period covered by the dataset, which businesses appear to
+be more prosperous? Which appear to be struggling? Describe your
+rationale for your answers. Limit your response to 10 images and 500
+words.</li>
+<li>How does the financial health of the residents change over the
+period covered by the dataset? How do wages compare to the overall cost
+of living in Engagement? Are there groups that appear to exhibit similar
+patterns? Describe your rationale for your answers. Limit your response
+to 10 images and 500 words.</li>
+<li>Describe the health of the various employers within the city limits.
+What employment patterns do you observe? Do you notice any areas of
+particularly high or low turnover? Limit your response to 10 images and
+500 words.</li>
 </ol>
 <h1 id="approach">Approach</h1>
 <h2 id="question-1">Question 1</h2>
-<p>It is observed from the datasets provided by <a href="https://vast-challenge.github.io/2022/">VAST Challenge 2022</a> that there are two types of businesses present in Engagement, Ohio USA, namely:</p>
+<p>It is observed from the datasets provided by <a
+href="https://vast-challenge.github.io/2022/">VAST Challenge 2022</a>
+that there are two types of businesses present in Engagement, Ohio USA,
+namely:</p>
 <ul>
 <li>Restaurants;</li>
 <li>Pubs</li>
@@ -2147,52 +2187,147 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <li>Frequency and number of participants’ visits;</li>
 <li>Revenue (participants’ spending)</li>
 </ul>
-<p>According to the dataset descriptions provided by VAST Challenge, all restaurants have a Prix Fixe food cost for participants to dine in and all pubs have a hourly cost to visit the pub. Therefore, assuming all visits to restaurants are for dinning, restaurants’ revenue will be calculated by number of visits times Prix Fixe food cost. Similarly, pubs’ revenue will be calculated by duration of visits times hourly cost of visits.</p>
-<p>Alternative approach of deriving balance difference before and after restaurants and pubs visits as spending is considered but not preferred as balance differences are inconsistent and could be due to unknown reasons.</p>
+<p>According to the dataset descriptions provided by VAST Challenge, all
+restaurants have a Prix Fixe food cost for participants to dine in and
+all pubs have a hourly cost to visit the pub. Therefore, assuming all
+visits to restaurants are for dinning, restaurants’ revenue will be
+calculated by number of visits times Prix Fixe food cost. Similarly,
+pubs’ revenue will be calculated by duration of visits times hourly cost
+of visits.</p>
+<p>Alternative approach of deriving balance difference before and after
+restaurants and pubs visits as spending is considered but not preferred
+as balance differences are inconsistent and could be due to unknown
+reasons.</p>
 <h2 id="question-2">Question 2</h2>
-<p>One question which rides in the minds of every reader who resides or does not reside in a city is - How expensive or affordable is the cost of living here? Can a resident residing here build up a good bank balance over the years?</p>
-<p>Keeping the sample of 1000 participants in mind, this segment will help study the financial health of each of the participants.</p>
-<p>The <i>FinancialJournal.csv</i> helps understand the expense in categories such as Food, Recreation, Shelter and Earnings such as Wage. (Assumption : All positive values corresponds to credit and negative ones are debited)</p>
-<p><i>Trellis Display</i> can be used to understand the cost of living of each of the participants. This will also give us an idea on the living index of the city over the months to see if the living standard increased over the months which may have motivated participants to leave the city.</p>
-<p>The sample collected consists of diverse participants. Participants can be partitioned based on the educational qualifications, Number of Household members, Interest groups (A-H), Age groups, etc. We can use such partitions to our favour to understand the similarity between groups.</p>
-<p>Since we are dealing with our data in monthly format, <i>Column Graph</i> can help us understand the expenses incurred by these groups.</p>
-<p><i>Ridge plot</i> can help us understand the distribution in the expenses over months during peak and off peak seasons</p>
-<p>To understand the earning pattern of the participants, a <i>Lorenz curve</i> can help us understand if the rich gets richer.</p>
-<p>With the help of Interactive/Coordinated plots (Example: Scattered plot), we can also understand if people who earn more, spend more and if we see any relation with joviality.</p>
+<p>One question which rides in the minds of every reader who resides or
+does not reside in a city is - How expensive or affordable is the cost
+of living here? Can a resident residing here build up a good bank
+balance over the years?</p>
+<p>Keeping the sample of 1000 participants in mind, this segment will
+help study the financial health of each of the participants.</p>
+<p>The <i>FinancialJournal.csv</i> helps understand the expense in
+categories such as Food, Recreation, Shelter and Earnings such as Wage.
+(Assumption : All positive values corresponds to credit and negative
+ones are debited)</p>
+<p><i>Trellis Display</i> can be used to understand the cost of living
+of each of the participants. This will also give us an idea on the
+living index of the city over the months to see if the living standard
+increased over the months which may have motivated participants to leave
+the city.</p>
+<p>The sample collected consists of diverse participants. Participants
+can be partitioned based on the educational qualifications, Number of
+Household members, Interest groups (A-H), Age groups, etc. We can use
+such partitions to our favour to understand the similarity between
+groups.</p>
+<p>Since we are dealing with our data in monthly format, <i>Column
+Graph</i> can help us understand the expenses incurred by these
+groups.</p>
+<p><i>Ridge plot</i> can help us understand the distribution in the
+expenses over months during peak and off peak seasons</p>
+<p>To understand the earning pattern of the participants, a <i>Lorenz
+curve</i> can help us understand if the rich gets richer.</p>
+<p>With the help of Interactive/Coordinated plots (Example: Scattered
+plot), we can also understand if people who earn more, spend more and if
+we see any relation with joviality.</p>
 <h2 id="question-3">Question 3</h2>
-<h3 id="financial-health-of-the-employers">Financial health of the employers</h3>
-<p>By merging <em>jobs.csv</em> and <em>employers.csv</em> by employerId, we can find out which employer pays more and thereby we can arrive to the conclusion of financial status of employers.</p>
-<p>Also by deriving Which employers have the record of most numbers of employees switching jobs, we’ll understand their workspace culture and how likely the employer(company) may be referred to ?</p>
+<h3 id="financial-health-of-the-employers">Financial health of the
+employers</h3>
+<p>By merging <em>jobs.csv</em> and <em>employers.csv</em> by
+employerId, we can find out which employer pays more and thereby we can
+arrive to the conclusion of financial status of employers.</p>
+<p>Also by deriving Which employers have the record of most numbers of
+employees switching jobs, we’ll understand their workspace culture and
+how likely the employer(company) may be referred to ?</p>
 <h3 id="employment-patterns">Employment patterns</h3>
-<p>We can also find out how many jobs does each Workplace provding with the help of <em>jobs.csv</em> and <em>employers.csv</em></p>
-<p>Also, with the help of <em>jobs.csv</em> file, let’s try to find if there is any correlation between employees’ pay and their educational qualification.</p>
+<p>We can also find out how many jobs does each Workplace provding with
+the help of <em>jobs.csv</em> and <em>employers.csv</em></p>
+<p>Also, with the help of <em>jobs.csv</em> file, let’s try to find if
+there is any correlation between employees’ pay and their educational
+qualification.</p>
 <h3 id="turnover-analysis">Turnover Analysis</h3>
-<p>To analyse the turnover, let us have a close look on <em>TravelJournal.csv</em>. Once the data wrangling (filtering out the purpose of Work/Home commute and grouping by participantId, travelEndLocation) is performed, we are not just finding out the overall turnover percentage rate but also with the help of apprpriate visualisation we are able to find out the exact participants who have disappeared from local job market, and who have partially employed by examining the no. of rows (n).</p>
+<p>To analyse the turnover, let us have a close look on
+<em>TravelJournal.csv</em>. Once the data wrangling (filtering out the
+purpose of Work/Home commute and grouping by participantId,
+travelEndLocation) is performed, we are not just finding out the overall
+turnover percentage rate but also with the help of apprpriate
+visualisation we are able to find out the exact participants who have
+disappeared from local job market, and who have partially employed by
+examining the no. of rows (n).</p>
 <h1 id="early-prototypes">Early Prototypes</h1>
-<h4 id="understanding-the-cost-of-living-of-participants">Understanding the cost of living of Participants</h4>
+<h4 id="reveal-the-prosperity-of-the-restaurants-and-pubs">Reveal the
+prosperity of the restaurants and pubs</h4>
+<p>We propose to use two trellis plots on restaurants and pubs’ number
+of customer visits to illustrate the prosperity of the restaurants and
+pubs’ business. The nature of the trellis plot also allows users to sort
+and filter the visualization based on different conditions.</p>
+<figure>
+<img src="pictures/restaurant%20trellis.png"
+alt="Restaurant Customer Visit Trellis Plot" />
+<figcaption aria-hidden="true">Restaurant Customer Visit Trellis
+Plot</figcaption>
+</figure>
+<figure>
+<img src="pictures/pubs%20trellis.png"
+alt="Pubs Customer Visit Trellis Plot" />
+<figcaption aria-hidden="true">Pubs Customer Visit Trellis
+Plot</figcaption>
+</figure>
+<p>For example, users can filter by price of the pubs’ hourly cost and
+sort the trellis plot by descending order of the largest number of
+visits, to find out the most popular pubs in the given price range.</p>
+<figure>
+<img src="pictures/filter.png" alt="Filter Pubs by Hourly Cost" />
+<figcaption aria-hidden="true">Filter Pubs by Hourly Cost</figcaption>
+</figure>
+<figure>
+<img src="pictures/sort.png"
+alt="Sort Pubs by Highest Number of Costomer Visits" />
+<figcaption aria-hidden="true">Sort Pubs by Highest Number of Costomer
+Visits</figcaption>
+</figure>
+<h4 id="understanding-the-cost-of-living-of-participants">Understanding
+the cost of living of Participants</h4>
 <p>Graph: Line chart in Trellis Display <img src="Trellis.png"></p>
-<p>Rationale: It will help us to understand the cost of living of each and every participant and given the functionality of the Trelliscope, we can add additional filters such as educational background and age group to understand the trends amongst such groups</p>
-<h4 id="comparing-and-relating-the-earning-and-expenditure-trends">Comparing and relating the earning and expenditure trends</h4>
-<p>Graph: Scatter plot for each of the components, designed in a coordinated way</p>
+<p>Rationale: It will help us to understand the cost of living of each
+and every participant and given the functionality of the Trelliscope, we
+can add additional filters such as educational background and age group
+to understand the trends amongst such groups</p>
+<h4
+id="comparing-and-relating-the-earning-and-expenditure-trends">Comparing
+and relating the earning and expenditure trends</h4>
+<p>Graph: Scatter plot for each of the components, designed in a
+coordinated way</p>
 <p><img src="CoordinatedGraph.png"></p>
-<p>Rationale: We would be able to highlight and deep dive on unusual trends and the table will help us understand the attributes.</p>
-<h4 id="finding-out-the-similarity-between-groups">Finding out the similarity between groups</h4>
+<p>Rationale: We would be able to highlight and deep dive on unusual
+trends and the table will help us understand the attributes.</p>
+<h4 id="finding-out-the-similarity-between-groups">Finding out the
+similarity between groups</h4>
 <p>Graph: Column graph depicting the expenditure patterns.</p>
 <p><img src="download.gif"></p>
-<p>Rationale: By creating an animated graph seperated between months, we can observe the rise/fall in the expenditure pattern between groups</p>
-<h4 id="inequality-amongst-participants">Inequality amongst participants</h4>
+<p>Rationale: By creating an animated graph seperated between months, we
+can observe the rise/fall in the expenditure pattern between groups</p>
+<h4 id="inequality-amongst-participants">Inequality amongst
+participants</h4>
 <p>Graph: Lorenz curve</p>
 <p><img src="Lorenz.png"></p>
-<p>Rationale: A Lorenz curve is a graphical representation of the distribution of income or wealth within a population.</p>
-<h4 id="the-risefall-of-available-balance">The rise/fall of available balance</h4>
+<p>Rationale: A Lorenz curve is a graphical representation of the
+distribution of income or wealth within a population.</p>
+<h4 id="the-risefall-of-available-balance">The rise/fall of available
+balance</h4>
 <p>Graph: Slope Graph</p>
 <p><img src="SlopeGraph.png"></p>
-<p>Rationale: This will help us compare between participants and depict a graphical representation of the financial health over the months</p>
-<h4 id="understanding-the-opening-and-closing-monthly-expense">Understanding the opening and closing monthly expense</h4>
+<p>Rationale: This will help us compare between participants and depict
+a graphical representation of the financial health over the months</p>
+<h4
+id="understanding-the-opening-and-closing-monthly-expense">Understanding
+the opening and closing monthly expense</h4>
 <p>Graph: Candle Stick</p>
 <p><img src="CandleStick.png"></p>
-<p>Rationale: Like the opening and closing figures of stock market, we can notice the same here with the available balance and understand the peak months when the expense has been ceiling high.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<p>Rationale: Like the opening and closing figures of stock market, we
+can notice the same here with the available balance and understand the
+peak months when the expense has been ceiling high.</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
