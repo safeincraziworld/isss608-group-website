@@ -9,34 +9,12 @@ weight: 5
 header_menu: true
 ---
 
-![Group 3](images/group_pic.jpg)
-
-#### Group 3
-
-Leslie Long Nu
-
-{{<icon class="fa fa-envelope">}}&nbsp;[nu.long.2021@mitb.smu.edu.sg](mailto:your-email@your-domain.com)
-
-{{<icon class="fa fa-phone">}}&nbsp;[+65 94214808](tel:+491111555555)
-
-{{<icon class="fa fa-camera">}}&nbsp;https://www.linkedin.com/in/leslielongnu/
-
-
-Raunak Kapur
-
-{{<icon class="fa fa-envelope">}}&nbsp;[raunakk.2021@mitb.smu.edu.sg](mailto:your-email@your-domain.com)
-
-{{<icon class="fa fa-phone">}}&nbsp;[+65 85751387](tel:+491111555555)
-
-{{<icon class="fa fa-camera">}}&nbsp;https://www.linkedin.com/in/raunak-kapur-520b47141/
-
-Raveena Chakrapani
-
-{{<icon class="fa fa-envelope">}}&nbsp;[raveenac.2021@mitb.smu.edu.sg](mailto:your-email@your-domain.com)
-
-{{<icon class="fa fa-phone">}}&nbsp;[+65 90373705](tel:+491111555555)
-
-{{<icon class="fa fa-camera">}}&nbsp; https://www.linkedin.com/in/raveena-chakrapani-444a60174/
+![](images/leslie.png)  |  ![](images/raunak.png)  |  ![](images/raveena.png)
+:-------------------------:|:-------------------------:|:-------------------------:
+Leslie Long Nu             |  Raunak Kapur             |  Raveena Chakrapani 
+{{<icon class="fa fa-envelope">}}&nbsp;[nu.long.2021@mitb.smu.edu.sg](mailto:your-email@your-domain.com) |        {{<icon class="fa fa-envelope">}}&nbsp;[raunakk.2021@mitb.smu.edu.sg](mailto:your-email@your-domain.com) |        {{<icon class="fa fa-envelope">}}&nbsp;[raveenac.2021@mitb.smu.edu.sg](mailto:your-email@your-domain.com)
+{{<icon class="fa fa-phone">}}&nbsp;[+65 94214808](tel:+491111555555)                                    |        {{<icon class="fa fa-phone">}}&nbsp;[+65 85751387](tel:+491111555555)                                    |        {{<icon class="fa fa-phone">}}&nbsp;[+65 90373705](tel:+491111555555)
+{{<icon class="fa fa-camera">}}&nbsp; https://www.linkedin.com/in/leslielongnu/                          |        {{<icon class="fa fa-camera">}}&nbsp; https://www.linkedin.com/in/raunak-kapur-520b47141/                |        {{<icon class="fa fa-camera">}}&nbsp; https://www.linkedin.com/in/raveena-chakrapani-444a60174/
 
 
 
