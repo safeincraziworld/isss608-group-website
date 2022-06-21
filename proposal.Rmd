@@ -91,6 +91,7 @@ Also, with the help of *jobs.csv* file, let's try to find if there is any correl
 To analyse the turnover, let us have a close look on *TravelJournal.csv*. Once the data wrangling (filtering out the purpose of Work/Home commute and grouping by participantId, travelEndLocation) is performed, we are not just finding out the overall turnover percentage rate but also with the help of apprpriate visualisation we are able to find out the exact participants who have disappeared from local job market, and who have partially employed by examining the no. of rows (n).
 
 # Early Prototypes
+
 #### Reveal the prosperity of the restaurants and pubs
 
 We propose to use two trellis plots on restaurants and pubs' number of customer visits to illustrate the prosperity of the restaurants and pubs' business. The nature of the trellis plot also allows users to sort and filter the visualization based on different conditions. 
@@ -153,20 +154,17 @@ Graph: Candle Stick
 
 Rationale: Like the opening and closing figures of stock market, we can notice the same here with the available balance and understand the peak months when the expense has been ceiling high.
 
-
 Graph : Boxplot
 
 image: ![](boxplot.jpeg)
 
 This boxplot helps us to understand pay of participants with different educational qualification. The minimum, maximum, median and also mean pay of the participants for each educational background can be examined.
 
-
 Graph : Line chart
 
 image: ![](turnover.jpeg)
 
 This graph helps us to understand the no. of participants who left a workplace over a period of time.
-
 
 Graph : Treemap
 
