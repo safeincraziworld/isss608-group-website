@@ -103,7 +103,7 @@ For example, users can filter by price of the pubs' hourly cost and sort the tre
 
 ![Filter Pubs by Hourly Cost](pictures/filter.png)
 
-![Sort Pubs by Highest Number of Costomer Visits](pictures/sort.png)
+![Sort Pubs by Highest Number of Customer Visits](pictures/sort.png)
 
 #### Understanding the cost of living of Participants
 
