@@ -258,10 +258,10 @@ ui <- navbarPage(
              tabPanel("Q2.1",
                       
                       fluidRow(
-                               column(4,valueBoxOutput("value1")),
-                               column(4,valueBoxOutput("value2")),
-                               column(4,valueBoxOutput("value3"))
-                               ),
+                        column(4,valueBoxOutput("value1")),
+                        column(4,valueBoxOutput("value2")),
+                        column(4,valueBoxOutput("value3"))
+                      ),
                       
                       fluidRow(
                         column(6,reactableOutput("EarningReactableDashboard", 
@@ -274,60 +274,60 @@ ui <- navbarPage(
                                                  inline = FALSE))
                       ),
                       fluidRow(
-                               column(6,checkboxGroupInput("category", "Variables to show:",
-                                                           c("Education" = "Education",
-                                                             "Food" = "Food",
-                                                             "Recreation" = "Recreation",
-                                                             "Shelter" = "Shelter"),
-                                                           selected = "Education")),
-                               column(6,plotlyOutput("ExpensesTrellis"))
-                               
-                               ),
-                      
-                      fluidRow(
-                               column(6,checkboxGroupInput("Months", "Variables to show:",
-                                                           c("Nov 22" = "Nov 22",
-                                                             "Dec 22" = "Dec 22",
-                                                             "Jan 23" = "Jan 23",
-                                                             "Feb 23" = "Feb 23"),
-                                                           selected = "Nov 22")),
-                               column(6,plotOutput("ExpensesEachMonth"))
-                               ),
-                      
-                      
-                      fluidRow(
-                               column(6,tmapOutput("FinLocation")),
-                               column(6,plotlyOutput("InterestGroups"))
-                            
-                               
-                               ),
-                      fluidRow(
-                               column(6,plotOutput("HeatMap")),
-                               column(6,plotlyOutput("CandleStickGraph"))
-                               
-                               
+                        column(6,checkboxGroupInput("category", "Variables to show:",
+                                                    c("Education" = "Education",
+                                                      "Food" = "Food",
+                                                      "Recreation" = "Recreation",
+                                                      "Shelter" = "Shelter"),
+                                                    selected = "Education")),
+                        column(6,plotlyOutput("ExpensesTrellis"))
+                        
                       ),
                       
-             
-                    
+                      fluidRow(
+                        column(6,checkboxGroupInput("Months", "Variables to show:",
+                                                    c("Nov 22" = "Nov 22",
+                                                      "Dec 22" = "Dec 22",
+                                                      "Jan 23" = "Jan 23",
+                                                      "Feb 23" = "Feb 23"),
+                                                    selected = "Nov 22")),
+                        column(6,plotOutput("ExpensesEachMonth"))
+                      ),
+                      
+                      
+                      fluidRow(
+                        column(6,tmapOutput("FinLocation")),
+                        column(6,plotlyOutput("InterestGroups"))
+                        
+                        
+                      ),
+                      fluidRow(
+                        column(6,plotOutput("HeatMap")),
+                        column(6,plotlyOutput("CandleStickGraph"))
+                        
+                        
+                      ),
                       
                       
                       
                       
-                  
-                          
-                
-                        
-                        
-                        #mainPanel(
-                        #  uiOutput("CoordinatedPlot"),
-                        #  width = "100%", height = "400px"
-                        #),
-                        
-                        
-                        
-                        
-                       )
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      
+                      #mainPanel(
+                      #  uiOutput("CoordinatedPlot"),
+                      #  width = "100%", height = "400px"
+                      #),
+                      
+                      
+                      
+                      
+             )
   ),
   navbarMenu("Q3",
              tabPanel("Principal Component Analysis"),
@@ -488,8 +488,8 @@ server <- function(input, output){
   
   
   output$EarningReactableDashboard <- renderReactable({
-
- 
+    
+    
     
     reactable(
       ParticipantMonthlyEarningSpark,
@@ -511,7 +511,7 @@ server <- function(input, output){
   })
   
   output$ExpenseReactableDashboard <- renderReactable({
-  
+    
     reactable(
       ParticipantMonthlyExpenseSpark,
       columns = list(
@@ -624,7 +624,7 @@ server <- function(input, output){
     
     
   })
-
+  
 }
 
 shinyApp(ui = ui, server = server)
