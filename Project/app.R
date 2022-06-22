@@ -5,7 +5,8 @@ packages=c('ggiraph', 'plotly', 'rmarkdown','psych','sf','tmap',
            'gganimate', 'tidyverse','ggthemes','reactable',
            'readxl', 'gifski', 'gapminder','quantmod','shinythemes',
            'treemap', 'treemapify','ggridges','zoo','reactablefmtr',
-           'rPackedBar','lubridate','remotes')
+           'rPackedBar','lubridate','remotes','ggplot2','dplyr','ggstatsplot',
+           'lubridate','shiny','tools')
 for (p in packages){
   if(!require(p,character.only=T)){
     install.packages(p)
@@ -22,6 +23,17 @@ Participants<-read_csv("data/Participants.csv",show_col_types = FALSE)
 ParticipantsApartmentLocation<-read_csv("data/ParticipantsApartmentLocation.csv",show_col_types = FALSE)
 buildings<-read_sf("data/buildings.csv", 
                    options = "GEOM_POSSIBLE_NAMES=location")
+
+jobs <- read_csv("data/Jobs.csv")
+emp <- read_csv("data/Employers.csv")
+travel <- read_csv("data/TravelJournal.csv")
+apartments <- read_csv("data/wkt/Apartments.csv")
+participants <- read_csv("data/Participants.csv")
+buildings <- read_sf("data/wkt/Buildings.csv", 
+                     options = "GEOM_POSSIBLE_NAMES=location")
+employers <- read_sf("data/wkt/Employers.csv", 
+                     options = "GEOM_POSSIBLE_NAMES=location")
+logs_selected <- read_rds("data/logs_selected.rds")
 
 
 
@@ -244,12 +256,174 @@ Ex <- ggplot(data=PShighlighted,
 
 ########################## Q3 ########################## 
 
+jobs<-jobs %>%
+  mutate(workinghours=difftime(jobs$endTime,jobs$startTime,units='hours')*5)
+jobs<-jobs %>%
+  mutate(weeklypay=hourlyRate*workinghours)
+jobs$weeklypay=as.numeric(jobs$weeklypay)
+jobs <-jobs %>%
+  mutate(educationRequirement = factor(jobs$educationRequirement, level = c('Low', 'HighSchoolOrCollege','Bachelors','Graduate')))
+
+participants<- participants %>%
+  mutate(jovialityGroup= cut(joviality, breaks =c(-Inf,0.2,0.5,0.8,1),labels=c("Not too Happy","Fairly Happy","Happy","Very Happy"))) %>%
+  mutate(ageGroup = cut(age,breaks=c(18,35,55,Inf),labels=c("Young Adult","Middle Age","Older Adult"),
+                        include.lowest = TRUE))
+
+hires <- jobs %>%
+  group_by(employerId) %>% tally() %>%
+  arrange(desc(n)) %>%
+  dplyr::rename("No. of employees" = "n")
+
+employerpay <- jobs %>%
+  group_by(employerId) %>%
+  dplyr::summarise(emppay = sum(weeklypay))
+
+pay_hires <- merge(x = hires, y = employerpay, by = "employerId", all = TRUE) %>%
+  mutate(employeepay = emppay / `No. of employees`) %>%
+  arrange(desc(employeepay)) %>%
+  dplyr::select(employerId,`No. of employees`, employeepay) %>%
+  arrange(employerId)
+pay_hires
+
+
+work_home <- travel %>%
+  filter(purpose == "Work/Home Commute") %>%
+  group_by(participantId,travelEndLocationId) %>%
+  tally() %>%
+  dplyr::select('participantId','travelEndLocationId') 
+
+work <- inner_join(x = work_home, y = emp, by= c("travelEndLocationId"="employerId" )) %>%
+  dplyr::select('participantId','travelEndLocationId') %>%
+  group_by(participantId) %>%
+  tally() %>%
+  dplyr::rename('numberofplacesworked'='n')
+
+workinmoreplaces <- work %>%
+  filter(numberofplacesworked > 1) %>%
+  arrange(participantId)
+
+work_home_filt <- travel %>%
+  filter(purpose == "Work/Home Commute") %>%
+  group_by(participantId,travelEndLocationId) %>%
+  tally() %>%
+  dplyr::select('participantId','travelEndLocationId') %>%
+  filter(travelEndLocationId
+         %in% emp$employerId & participantId %in% workinmoreplaces$participantId)
+
+empWorkinMultiplePlaces <- travel %>%
+  mutate(StartDate = as_date(travelStartTime)) %>%
+  filter (participantId %in% work_home_filt$participantId &
+            purpose == "Work/Home Commute" &
+            travelEndLocationId %in% work_home_filt$travelEndLocationId) %>%
+  dplyr::select(participantId,StartDate,travelEndLocationId) %>%
+  arrange(participantId)
+
+empWorkinMultiplePlaces <- empWorkinMultiplePlaces %>%
+  group_by(participantId) %>%
+  filter(StartDate == min(StartDate) | StartDate == max(StartDate)) %>%
+  ungroup
+
+empWorkinMultiplePlaces_latest <- empWorkinMultiplePlaces %>%
+  group_by(participantId) %>%
+  slice(which.max(StartDate)) %>%
+  dplyr::rename ("recent_employer" = "travelEndLocationId")
+
+empWorkinMultiplePlaces_previous <- empWorkinMultiplePlaces %>%
+  group_by(participantId) %>%
+  slice(which.min(StartDate)) %>%
+  dplyr::rename ("previous_employer" = "travelEndLocationId")
+
+empWorkinMultiplePlaces_latest_groupby <- empWorkinMultiplePlaces_latest %>%
+  group_by(recent_employer) %>%
+  tally() %>%
+  dplyr::rename("no.ofempShifted" = "n") %>%
+  arrange(desc(`no.ofempShifted`))
+
+empWorkinMultiplePlaces_previous_groupby <- empWorkinMultiplePlaces_previous %>%
+  group_by(previous_employer) %>%
+  tally() %>%
+  dplyr::rename("no.ofempLeft" = "n") %>%
+  arrange(desc(`no.ofempLeft`))
+
+transitionTable <- inner_join(x=empWorkinMultiplePlaces_previous ,
+                              y=empWorkinMultiplePlaces_latest,
+                              by = "participantId") %>%
+  dplyr::select(participantId,previous_employer,recent_employer)
+transitionEmpDetails <- participants %>%
+  filter(participantId %in% transitionTable$participantId)
+
+employers <- employers %>% 
+  mutate(across(employerId, as.integer))
+
+prevEmp_sf <- employers %>%
+  filter(employerId %in% transitionTable$previous_employer ) %>%
+  mutate(empWorkinMultiplePlaces_previous_groupby$no.ofempLeft) %>%
+  dplyr::rename("no.ofempLeft" = "empWorkinMultiplePlaces_previous_groupby$no.ofempLeft")
+
+recntEmp_sf <- employers %>%
+  filter(employerId %in% transitionTable$recent_employer )%>%
+  mutate(empWorkinMultiplePlaces_latest_groupby$no.ofempShifted) %>%
+  dplyr::rename("no.ofempShifted" = "empWorkinMultiplePlaces_latest_groupby$no.ofempShifted")
+
+
+hex <- st_make_grid(buildings, 
+                    cellsize=100, 
+                    square=FALSE) %>%
+  st_sf() %>%
+  rowid_to_column('hex_id')
+points_in_hex <- st_join(logs_selected, 
+                         hex, 
+                         join=st_within)
+
+points_in_hex <- st_join(logs_selected, 
+                         hex, 
+                         join=st_within) %>%
+  st_set_geometry(NULL) %>%
+  dplyr::count(name='pointCount', hex_id)
+
+hex_combined <- hex %>%
+  left_join(points_in_hex, 
+            by = 'hex_id') %>%
+  replace(is.na(.), 0)
+
+p <- tm_shape(hex_combined %>%
+                filter(pointCount > 0))+
+  tm_fill("pointCount",
+          n = 8,
+          style = "quantile") +
+  tm_borders(alpha = 0.1)
+
+logs_path <- logs_selected %>%
+  group_by(participantId, day) %>%
+  dplyr::summarize(m = mean(Timestamp), 
+                   do_union=FALSE) %>%
+  mutate(date = as_date(m)) %>%
+  st_cast("LINESTRING")
+logs_path_PrevJob <-logs_path %>%
+  filter(participantId %in% 
+           empWorkinMultiplePlaces_previous$participantId &
+           date %in% 
+           empWorkinMultiplePlaces_previous$StartDate) %>%
+  slice(which.min(date)) %>%
+  dplyr::select(participantId,date,currentLocation)
+
+partid = c(logs_path_PrevJob$participantId)
+
+logs_path_RecJob <-logs_path %>%
+  filter(participantId %in% 
+           empWorkinMultiplePlaces_latest$participantId &
+           date %in% 
+           empWorkinMultiplePlaces_latest$StartDate) %>%
+  slice(which.max(date)) %>%
+  dplyr::select(participantId,date,currentLocation)
+
+
 
 ########################## UI ########################## 
 ui <- navbarPage(
   title = "Financial Health of the city",
   fluid = TRUE,
-  theme=shinytheme("flatly"),
+  theme=shinytheme("united"),
   id = "navbarID",
   tabPanel("Introduction"),
   navbarMenu("Q1"),
@@ -329,11 +503,164 @@ ui <- navbarPage(
                       
              )
   ),
-  navbarMenu("Q3",
-             tabPanel("Principal Component Analysis"),
-             tabPanel("Hierarchical Custering"),
-             tabPanel("kmeans Clustering"),
-             tabPanel("Multiple Linear Regression"))
+  navbarMenu("Employment & Turnover",
+             tabPanel("Uncertainity",
+                      fluidPage(
+                        
+                        titlePanel("Are there more participants who switch jobs ?"),
+                        fluidRow(
+                          column(
+                            width = 12,
+                            height = 100,
+                            tabsetPanel(
+                              tabPanel("One Sample Test ",
+                                       box(
+                                         width = 4,
+                                         height = 60,
+                                         selectInput(inputId = "variable_selection", 
+                                                     label =   "Type of test:",
+                                                     choices =  c("Parametric" = "parametric",
+                                                                  "Non Parametric" = "nonparametric",
+                                                                  "Robust" = "robust"),
+                                                     selected = "Parametric"
+                                         )),
+                                       box(plotOutput("testPlot")),
+                                       box(
+                                         width = 8,
+                                         height = 120,
+                                         h4('Insights:')
+                                         
+                                       )
+                              ),
+                              
+                              tabPanel("Error Bar",
+                                       box(plotOutput("err_op"))
+                                       
+                              ),
+                              
+                              
+                            )
+                          )
+                        )
+                      )
+                      
+                      
+                      ),
+             tabPanel("Turnover Analysis",
+                      fluidPage(
+                      titlePanel("What is the impact of job switch among paticipants ?"),
+                      fluidRow(
+                        column(
+                          width = 12,
+                          height = 100,
+                          tabsetPanel(
+                            tabPanel("Job Route",
+                                     box(
+                                       width = 20,
+                                       height = 100,
+                                       selectInput(inputId = "participants",
+                                                   label = "Select Participant Id",
+                                                   choices = partid,
+                                                   selected = c(partid[0]))
+                                       
+                                     ),
+                                     fluidRow(
+                                       box("Commute route from home to work before job change",
+                                           tmapOutput(outputId = "befRoute",
+                                                      width = 500,
+                                                      height = 500),
+                                       ),
+                                       box("Commute route from home to work after job change",
+                                           tmapOutput(outputId  = "aftRoute",
+                                                      width = 500,
+                                                      height = 500)
+                                       )
+                                     )
+                                     
+                                     
+                            ),
+                            
+                            
+                          )
+                        )
+                      )
+                    )
+                 ),
+             tabPanel("Employment Pattern",
+                      fluidPage(
+                        titlePanel("What is the pattern found in the employment ?"),
+                        fluidRow(
+                          column(
+                            width = 12,
+                            height = 100,
+                            tabsetPanel(
+                              tabPanel("Education vs Pay",
+                                       box(
+                                         width = 4,
+                                         height = 320,
+                                         checkboxGroupInput(inputId = "edu", 
+                                                            label =   "Education Requirement:",
+                                                            choices =  c("Low" = "Low",
+                                                                         "High School or College" = "HighSchoolOrCollege",
+                                                                         "Bachelors" = "Bachelors",
+                                                                         "Graduate" = "Graduate"),
+                                                            selected = c("Low","HighSchoolOrCollege")
+                                         ),
+                                         textInput(
+                                           inputId = "plot_title",
+                                           label = "Plot title",
+                                           placeholder = "Enter text to be used as plot title"),
+                                         actionButton("goButton", "Go!"),
+                                         
+                                         checkboxInput(inputId = "showData",
+                                                       label = "Show data table",
+                                                       value = TRUE)
+                                       ),
+                                       box(
+                                         height = 400,
+                                         plotlyOutput("rainPlot")
+                                       ),
+                                       DT::dataTableOutput(outputId = "rainPlotTable")
+                                       
+                              ),
+                              
+                              
+                            )
+                          )
+                        )
+                        
+                      )),
+             tabPanel("Employer Health",
+                      fluidPage(
+                        titlePanel("Which employers are financially healthy ?"),
+                        fluidRow(
+                          column(
+                            width = 12,
+                            height = 100,
+                            tabsetPanel(
+                              tabPanel("Emp location",
+                                       box(
+                                         width = 4,
+                                         height = 150,
+                                         selectInput(inputId = "emp",
+                                                     label = "Employees left ",
+                                                     choices = c("Left" = "left",
+                                                                 "Joined" = "joined"),
+                                                     selected = "Left"),
+                                         checkboxInput(inputId = "showData",
+                                                       label = "Show data table",
+                                                       value = TRUE)
+                                       ),
+                                       box(tmapOutput("mapPlot")),
+                                       DT::dataTableOutput(outputId = "aTable")
+                                       
+                              ),
+                              
+                            )
+                          )
+                        )
+                        
+                      )))
 )
 
 #========================#
@@ -341,6 +668,11 @@ ui <- navbarPage(
 #========================#
 
 server <- function(input, output){
+  
+  ########################## Q1 ########################## 
+  
+  
+  ########################## Q2 ########################## 
   
   NumberOfParicipants<-Participants%>%
     tally()
@@ -621,6 +953,202 @@ server <- function(input, output){
     #        plot.title = element_text(hjust = 0.5),
     #        legend.title = element_text(size = 8),
     #        legend.text = element_text(size = 6))
+    
+    
+  })
+  
+  ########################## Q3 ########################## 
+  
+  output$testPlot <- renderPlot({
+    work_home <- travel %>%
+      filter(purpose == "Work/Home Commute") %>%
+      group_by(participantId,travelEndLocationId) %>%
+      tally() %>%
+      dplyr::select('participantId','travelEndLocationId') 
+    work <- inner_join(x = work_home, y = emp, by= c("travelEndLocationId"="employerId" )) %>%
+      dplyr::select('participantId','travelEndLocationId') %>%
+      group_by(participantId) %>%
+      tally() %>%
+      dplyr::rename('numberofplacesworked'='n')
+    workinmoreplaces = work %>%
+      filter(numberofplacesworked > 1) %>%
+      arrange(desc(numberofplacesworked))
+    
+    gg <- gghistostats(
+      data = work, 
+      x = numberofplacesworked, 
+      xlab = "numbers of places worked", 
+      type = input$variable_selection,
+      title = "Distribution of turnover rate", 
+      test.value = 1
+    )
+    
+    return(gg)
+    
+  })
+  
+  output$err_op <- renderPlot({
+    weeklypay_education <- jobs %>%
+      group_by(educationRequirement) %>%
+      summarise(
+        n=n(),
+        mean=mean(weeklypay),
+        sd=sd(weeklypay))%>%
+      mutate(se=sd/sqrt(n-1))
+    
+    errplt <- ggplot(weeklypay_education) +
+      geom_errorbar(
+        aes(x=educationRequirement, 
+            ymin=mean-se, 
+            ymax=mean+se), 
+        width=0.2, 
+        colour="black", 
+        alpha=0.9, 
+        size=0.5) +
+      geom_point(aes
+                 (x=educationRequirement, 
+                   y=mean), 
+                 stat="identity", 
+                 color="red",
+                 size = 1.5,
+                 alpha=1) +
+      ggtitle("Weekly pay vs educational requirement")+
+      theme(plot.title = element_text(hjust = 0.5))
+    
+    return(errplt)
+    
+  })
+  
+  output$rainPlot <- renderPlotly({
+    input$goButton
+    
+    p <- ggplot(jobs %>% filter(educationRequirement == input$edu),
+                aes(x = educationRequirement, y = hourlyRate, fill=educationRequirement)) + 
+      ggdist::stat_halfeye(
+        adjust = .5, 
+        width = .6, 
+        .width = 0, 
+        justification = -.3, 
+        point_colour = NA) + 
+      geom_boxplot(
+        width = .25, 
+        outlier.shape = NA
+      ) +
+      geom_point(
+        size = 1.3,
+        alpha = .3,
+        position = position_jitter(
+          seed = 1, width = .1
+        )
+      ) + 
+      coord_cartesian(xlim = c(1.2, NA), clip = "off")+
+      #ggtitle(label = "Wage Distribution for Different Education Level",
+      #subtitle = "High Wages For Higher Educated")+
+      theme_minimal()+
+      theme(plot.title = element_text(size=14, face="bold",hjust = 0.5),
+            plot.subtitle = element_text(size=12,hjust = 0.5,color='mediumvioletred'))+
+      theme(axis.title.y= element_text(angle=0), axis.ticks.x= element_blank(),
+            panel.background= element_blank(), axis.line= element_line(color= 'grey')) +
+      labs(title = isolate({
+        toTitleCase(input$plot_title)
+      }))
+    
+    ggplotly(p)
+  })
+  
+  output$rainPlotTable <- DT::renderDataTable({
+    input$showData
+    DT::datatable(jobs %>% filter(educationRequirement == input$edu) %>%
+                    select(jobId, employerId, hourlyRate, educationRequirement),
+                  options= list(pageLength = 10),
+                  rownames = FALSE)
+    
+  })  
+  
+  
+  output$mapPlot <- renderTmap({
+    
+    
+    if(input$emp == "left") {
+      tmap_mode("plot")
+      tm_shape(buildings)+
+        tm_polygons(col = "grey60",
+                    size = 1,
+                    border.col = "black",
+                    border.lwd = 1)+
+        tm_shape(prevEmp_sf) +
+        tm_bubbles(col = "red",
+                   n=3,
+                   size = "no.ofempLeft") 
+      
+    } 
+    else {
+      tmap_mode("plot")
+      tm_shape(buildings)+
+        tm_polygons(col = "grey60",
+                    size = 1,
+                    border.col = "black",
+                    border.lwd = 1)+
+        tm_shape(recntEmp_sf) +
+        tm_bubbles(col = "green",
+                   size = "no.ofempShifted") 
+    }
+    
+  })
+  
+  output$aTable <- DT::renderDataTable({
+    if(input$showData & input$emp == "left"){
+      DT::datatable(prevEmp_sf,
+                    options= list(pageLength = 10),
+                    rownames = FALSE)
+    }
+    else if(input$showData & input$emp == "joined"){
+      DT::datatable(recntEmp_sf,
+                    options= list(pageLength = 10),
+                    rownames = FALSE)
+    }
+  })  
+  
+  
+  output$befRoute <- renderTmap({
+    
+    
+    logs_path_PrevJob <- logs_path_PrevJob %>%
+      filter(participantId == input$participants)
+    
+    
+    tmap_mode("plot")
+    tm_shape(buildings)+
+      tm_polygons(col = "grey60",
+                  size = 1,
+                  border.col = "grey",
+                  border.lwd = 1) +
+      tm_shape(logs_path_PrevJob) +
+      tm_lines(col = "red") +
+      tm_layout(main.title = "Previous Job Route",
+                main.title.position = "center",
+                main.title.size = 1,
+                legend.show = FALSE)
+  })
+  
+  output$aftRoute <- renderTmap({
+    
+    logs_path_RecJob <- logs_path_RecJob %>%
+      filter(participantId == input$participants)
+    
+    
+    tmap_mode("plot")
+    tm_shape(buildings)+
+      tm_polygons(col = "grey60",
+                  size = 1,
+                  border.col = "grey",
+                  border.lwd = 1) +
+      tm_shape(logs_path_RecJob) +
+      tm_lines(col = "red") +
+      tm_layout(main.title = "Latest Job Route",
+                main.title.position = "center",
+                main.title.size = 1,
+                legend.show = TRUE)
     
     
   })
