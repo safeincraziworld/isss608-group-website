@@ -6,7 +6,7 @@ packages=c('ggiraph', 'plotly', 'rmarkdown','psych','sf','tmap',
            'readxl', 'gifski', 'gapminder','quantmod','shinythemes',
            'treemap', 'treemapify','ggridges','zoo','reactablefmtr',
            'rPackedBar','lubridate','remotes','ggplot2','dplyr','ggstatsplot',
-           'lubridate','shiny','tools')
+           'lubridate','shiny','tools','writexl')
 for (p in packages){
   if(!require(p,character.only=T)){
     install.packages(p)
@@ -371,11 +371,11 @@ hex <- st_make_grid(buildings,
                     square=FALSE) %>%
   st_sf() %>%
   rowid_to_column('hex_id')
-points_in_hex <- st_join(logs_selected, 
+points_in_hex <- sf::st_join(logs_selected, 
                          hex, 
                          join=st_within)
 
-points_in_hex <- st_join(logs_selected, 
+points_in_hex <- sf::st_join(logs_selected, 
                          hex, 
                          join=st_within) %>%
   st_set_geometry(NULL) %>%
@@ -417,6 +417,42 @@ logs_path_RecJob <-logs_path %>%
   slice(which.max(date)) %>%
   dplyr::select(participantId,date,currentLocation)
 
+################## treemap ##############
+
+no.ofjobs <- jobs %>% 
+  group_by(employerId) %>%
+  summarise(no.ofjobs = n(),
+            totalWage = sum(hourlyRate),
+            avgWage = mean(hourlyRate)) %>%
+  dplyr::rename('Average Wage' = 'avgWage') %>%
+  mutate(label = paste(no.ofjobs, 'Employees'))
+
+################### difference in wage bar plot ###################
+
+### Switch employee all details
+
+transitionTableWithPrevPay <- left_join(x=transitionTable, y= pay_hires, by= c("previous_employer"="employerId")) %>%
+  dplyr::select(participantId, previous_employer, employeepay) %>%
+  dplyr::rename("prevPay" = "employeepay")
+
+transitionTableWithRecentPay <- left_join(x=transitionTable, y= pay_hires, by= c("recent_employer"="employerId")) %>%
+  dplyr::select(participantId, recent_employer, employeepay) %>%
+  dplyr::rename("recentPay" = "employeepay")
+
+transitionTablewithPay <- inner_join(x=transitionTableWithPrevPay,
+                                     y=transitionTableWithRecentPay,
+                                     by = "participantId")
+
+switchEmployeesAllDetails <- switchEmployeesAllDetails %>%
+  inner_join(x=transitionTablewithPay,
+             y=transitionEmpDetails,
+             by="participantId") %>%
+  mutate(payDiff = recentPay - prevPay)
+
+switchEmployeesAllDetails <- switchEmployeesAllDetails %>%
+  mutate(payStatus = case_when(payDiff > 0 ~ "Pay Increase",
+                               payDiff < 0 ~ "Pay Decrease",
+                               TRUE ~ "Same Pay"))
 
 
 ########################## UI ########################## 
@@ -504,56 +540,33 @@ ui <- navbarPage(
              )
   ),
   navbarMenu("Employment & Turnover",
-             tabPanel("Uncertainity",
-                      fluidPage(
-                        
-                        titlePanel("Are there more participants who switch jobs ?"),
-                        fluidRow(
-                          column(
-                            width = 12,
-                            height = 100,
-                            tabsetPanel(
-                              tabPanel("One Sample Test ",
-                                       box(
-                                         width = 4,
-                                         height = 60,
-                                         selectInput(inputId = "variable_selection", 
-                                                     label =   "Type of test:",
-                                                     choices =  c("Parametric" = "parametric",
-                                                                  "Non Parametric" = "nonparametric",
-                                                                  "Robust" = "robust"),
-                                                     selected = "Parametric"
-                                         )),
-                                       box(plotOutput("testPlot")),
-                                       box(
-                                         width = 8,
-                                         height = 120,
-                                         h4('Insights:')
-                                         
-                                       )
-                              ),
-                              
-                              tabPanel("Error Bar",
-                                       box(plotOutput("err_op"))
-                                       
-                              ),
-                              
-                              
-                            )
-                          )
-                        )
-                      )
-                      
-                      
-                      ),
              tabPanel("Turnover Analysis",
                       fluidPage(
-                      titlePanel("What is the impact of job switch among paticipants ?"),
+                      titlePanel("What is the impact of job switch among participants ?"),
                       fluidRow(
                         column(
                           width = 12,
                           height = 100,
                           tabsetPanel(
+                            tabPanel("One Sample Test ",
+                                     box(
+                                       width = 4,
+                                       height = 60,
+                                       selectInput(inputId = "variable_selection", 
+                                                   label =   "Type of test:",
+                                                   choices =  c("Parametric" = "parametric",
+                                                                "Non Parametric" = "nonparametric",
+                                                                "Robust" = "robust"),
+                                                   selected = "Parametric"
+                                       )),
+                                     box(plotOutput("testPlot")),
+                                     box(
+                                       width = 8,
+                                       height = 120,
+                                       h4('Insights:')
+                                       
+                                     )
+                            ),
                             tabPanel("Job Route",
                                      box(
                                        width = 20,
@@ -561,22 +574,38 @@ ui <- navbarPage(
                                        selectInput(inputId = "participants",
                                                    label = "Select Participant Id",
                                                    choices = partid,
-                                                   selected = c(partid[0]))
+                                                   selected = c(partid[5]))
                                        
                                      ),
                                      fluidRow(
                                        box("Commute route from home to work before job change",
-                                           tmapOutput(outputId = "befRoute",
+                                           plotOutput(outputId = "befRoute",
                                                       width = 500,
                                                       height = 500),
                                        ),
                                        box("Commute route from home to work after job change",
-                                           tmapOutput(outputId  = "aftRoute",
+                                           plotOutput(outputId  = "aftRoute",
                                                       width = 500,
                                                       height = 500)
                                        )
                                      )
                                      
+                                     
+                            ),
+                            tabPanel("Change of Wage",
+                                     box(
+                                       width = 4,
+                                       height = 60,
+                                       checkboxGroupInput(inputId = "groupbyCategory", 
+                                                   label =   "Choose Category :",
+                                                   choices =  c("Education Level" = "educationLevel",
+                                                                "Household Size" = "householdSize",
+                                                                "Having Kids" = "haveKids",
+                                                                "Interest Group" = "interestGroup"),
+                                                   selected = "educationLevel"
+                                       )),
+                                     box(plotOutput("paychangePlot"))
+                                         
                                      
                             ),
                             
@@ -638,6 +667,26 @@ ui <- navbarPage(
                             width = 12,
                             height = 100,
                             tabsetPanel(
+                              tabPanel("Wage By Employers",
+                                       box(
+                                         width = 4,
+                                         height = 150,
+                                         selectInput(inputId = "color",
+                                                     label = "Choose Color type:",
+                                                     choices = c("Red-Blue Diverging" = "RdYlBu",
+                                                                 "Orange-Red Diverging" = "OrRd",
+                                                                 "Light -Dark Blue" = "Blues"),
+                                                     selected = "RdYlBu"),
+                                         sliderInput(inputId = "no.ofemp",
+                                                     label = "No. of Employees",
+                                                     min = 2,
+                                                     max = 9,
+                                                     value= 4)
+                                       ),
+                                       box(plotOutput("treemapPlot"))
+                                       
+                                       
+                              ),
                               tabPanel("Emp location",
                                        box(
                                          width = 4,
@@ -651,7 +700,7 @@ ui <- navbarPage(
                                                        label = "Show data table",
                                                        value = TRUE)
                                        ),
-                                       box(tmapOutput("mapPlot")),
+                                       box(plotOutput("mapPlot")),
                                        DT::dataTableOutput(outputId = "aTable")
                                        
                               ),
@@ -1066,7 +1115,7 @@ server <- function(input, output){
   })  
   
   
-  output$mapPlot <- renderTmap({
+  output$mapPlot <- renderPlot({
     
     
     if(input$emp == "left") {
@@ -1109,8 +1158,10 @@ server <- function(input, output){
     }
   })  
   
+  ############# Turnover analysis before and after route map ###################
   
-  output$befRoute <- renderTmap({
+  
+  output$befRoute <- renderPlot({
     
     
     logs_path_PrevJob <- logs_path_PrevJob %>%
@@ -1131,7 +1182,7 @@ server <- function(input, output){
                 legend.show = FALSE)
   })
   
-  output$aftRoute <- renderTmap({
+  output$aftRoute <- renderPlot({
     
     logs_path_RecJob <- logs_path_RecJob %>%
       filter(participantId == input$participants)
@@ -1153,6 +1204,35 @@ server <- function(input, output){
     
   })
   
+  output$treemapPlot <- renderPlot({
+    treemap(no.ofjobs %>% filter(no.ofjobs == input$no.ofemp),
+            index = c('label', 'employerId'),
+            vSize = 'totalWage',
+            vColor = 'Average Wage',
+            palette = input$color,
+            type = 'value',
+            title = 'Wage by Employer')
+    
+  })
+  
+  output$paychangePlot <- renderPlot({
+    
+    switchEmployeesAllDetails$participantId <- as.character(switchEmployeesAllDetails$participantId)
+    p1<- ggplot(switchEmployeesAllDetails,
+                aes(x=educationLevel, y=payDiff))+
+      geom_bar(stat="identity", aes(fill = payStatus))+
+      scale_fill_manual(values=c(`Pay Decrease` ="firebrick1", `Pay Increase` ="steelblue")) +
+      labs(y= 'Pay\n Difference',title="Employee Wage Difference Between Previous and Recent Workplace", x='Participant Id') +
+      theme(axis.title.y=element_text(angle=0), axis.ticks.x=element_blank(),panel.background = element_blank(),
+            axis.line = element_line(color='grey'), plot.title = element_text(hjust = 0.5),
+            axis.title.y.left = element_text(vjust = 0.5), axis.text = element_text(face="bold")
+      )
+   p1
+    
+  })
+  
 }
 
 shinyApp(ui = ui, server = server)
+
+
