@@ -4,7 +4,7 @@ packages=c('ggiraph', 'plotly', 'rmarkdown','psych','sf','tmap',
            'DT', 'patchwork','gglorenz','hrbrthemes','shinydashboard',
            'gganimate', 'tidyverse','ggthemes','reactable',
            'readxl', 'gifski', 'gapminder','quantmod','shinythemes',
-           'treemap', 'treemapify','ggridges','zoo','reactablefmtr',
+           'treemap', 'treemapify','ggridges','zoo','reactablefmtr','crosstalk',
            'rPackedBar','lubridate','remotes','ggplot2','dplyr','ggstatsplot',
            'lubridate','shiny','tools')
 for (p in packages){
@@ -180,13 +180,16 @@ ParticipantSavings<-
 
 ### Data for Sparklines
 
-ParticipantMonthlyExpenseSpark<-ParticipantMonthlySavings%>%
+ParticipantMonthlySpark<-ParticipantMonthlySavings%>%
   group_by(participantId)%>%
-  summarise(Expense=list(Expense))
+  summarise(Expense=list(Expense),
+            Earning=list(Earn))%>%
+  left_join(.,Participants,
+            by=c("participantId"="participantId"))
 
-ParticipantMonthlyEarningSpark<-ParticipantMonthlySavings%>%
-  group_by(participantId)%>%
-  summarise(Earning=list(Earn))
+#ParticipantMonthlyEarningSpark<-ParticipantMonthlySavings%>%
+#  group_by(participantId)%>%
+#  summarise(Earning=list(Earn))
 
 
 
@@ -212,10 +215,11 @@ S<-PartDetailsDailyExpense%>%
   group_by(date,interestGroup)%>%
   summarise(Expense=sum(Expense))
 
-a<-ggplot(PartDetailsDailyExpense%>%
-            group_by(date,interestGroup)%>%
-            summarise(Expense=sum(Expense)))+
-  geom_line(aes(x=date,y=log(Expense*-1),color=interestGroup))
+
+InterestGroupGraph<-PartDetailsDailyExpense%>%
+  group_by(date,interestGroup)%>%
+  summarise(Expense=sum(Expense))
+
 
 ### Coordinated Plot ###
 
@@ -432,46 +436,87 @@ ui <- navbarPage(
              tabPanel("Q2.1",
                       
                       fluidRow(
-                        column(4,valueBoxOutput("value1")),
-                        column(4,valueBoxOutput("value2")),
-                        column(4,valueBoxOutput("value3"))
+                        column(3,div(valueBoxOutput("value1"),style="color:white"),style="background-color:navy;width=100px"),
+                        
+                        column(6,div(valueBoxOutput("value2"),style="color:white"),style="background-color:purple;"),
+                        
+                        column(3,div(valueBoxOutput("value3"),style="color:white"),style="background-color:green;")
                       ),
                       
                       fluidRow(
-                        column(6,reactableOutput("EarningReactableDashboard", 
-                                                 width = "auto", 
-                                                 height = "auto", 
-                                                 inline = FALSE)),
-                        column(6,reactableOutput("ExpenseReactableDashboard", 
+                        column(3,selectInput(inputId = "HaveKidsDashboard", 
+                                             label =   "Have Kids",
+                                             choices =  c("All" = "All",
+                                                          "Yes" = "TRUE",
+                                                          "No" = "FALSE"),
+                                             selected = "All"
+                        )),
+                        
+                        column(3,selectInput(inputId = "HouseHoldSizeDashboard", 
+                                             label =   "HouseHold Size",
+                                             choices =  c("1" = "1",
+                                                          "2" = "2",
+                                                          "3"="3"),
+                                             multiple = TRUE,
+                                             selected = c("1",
+                                                          "2",
+                                                          "3")
+                        )),
+                        column(4,selectInput(inputId = "EducationDashboard", 
+                                             label =   "Education Qualification",
+                                             choices =  c("Low"="Low",
+                                               "High School or College"="HighSchoolOrCollege",
+                                                          "Bachelors"="Bachelors",
+                                               "Graduate"="Graduate"),
+                                             multiple = TRUE,
+                                             selected = c("Low",
+                                                          "HighSchoolOrCollege",
+                                                          "Bachelors",
+                                                          "Graduate")
+                        ))
+                        
+                               
+                               
+                        
+                        
+                      ),
+                      
+                      fluidRow(
+                        column(3,sliderInput("age", "Age:",
+                                           min = min(participants$age), max = max(participants$age),
+                                           value = c(min(participants$age),max(participants$age))))),
+                      
+                      fluidRow(
+                        column(12,reactableOutput("EarningReactableDashboard", 
                                                  width = "auto", 
                                                  height = "auto", 
                                                  inline = FALSE))
                       ),
                       fluidRow(
-                        column(6,checkboxGroupInput("category", "Variables to show:",
+                        column(3,checkboxGroupInput("category", "Variables to show:",
                                                     c("Education" = "Education",
                                                       "Food" = "Food",
                                                       "Recreation" = "Recreation",
                                                       "Shelter" = "Shelter"),
                                                     selected = "Education")),
-                        column(6,plotlyOutput("ExpensesTrellis"))
+                        column(9,plotlyOutput("ExpensesTrellis"))
                         
                       ),
                       
                       fluidRow(
-                        column(6,checkboxGroupInput("Months", "Variables to show:",
+                        column(3,checkboxGroupInput("Months", "Variables to show:",
                                                     c("Nov 22" = "Nov 22",
                                                       "Dec 22" = "Dec 22",
                                                       "Jan 23" = "Jan 23",
                                                       "Feb 23" = "Feb 23"),
                                                     selected = "Nov 22")),
-                        column(6,plotOutput("ExpensesEachMonth"))
+                        column(9,plotOutput("ExpensesEachMonth"))
                       ),
                       
                       
                       fluidRow(
-                        column(6,tmapOutput("FinLocation")),
-                        column(6,plotlyOutput("InterestGroups"))
+                        column(12,plotOutput("FinLocation")),
+                        
                         
                         
                       ),
@@ -481,18 +526,7 @@ ui <- navbarPage(
                         
                         
                       ),
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
-                      
+
                       #mainPanel(
                       #  uiOutput("CoordinatedPlot"),
                       #  width = "100%", height = "400px"
@@ -501,8 +535,27 @@ ui <- navbarPage(
                       
                       
                       
+             ),
+             
+             tabPanel("Q2.3",
+                      
+                      fluidRow(
+                        column(3,
+                               checkboxGroupInput("InterestGroup", "Interest Group",
+                                                    c("A" = "A",
+                                                      "B" = "B",
+                                                      "C" = "C",
+                                                      "D" = "D"),
+                                                    selected = "A")),
+                        
+                        
+                        column(9,plotlyOutput("InterestGroups")))
+                      
+                      
              )
+             
   ),
+             
   navbarMenu("Employment & Turnover",
              tabPanel("Uncertainity",
                       fluidPage(
@@ -673,15 +726,14 @@ server <- function(input, output){
   
   
   ########################## Q2 ########################## 
-  
   NumberOfParicipants<-Participants%>%
     tally()
   #### tmap #### 
-  output$FinLocation<-renderTmap({
+  output$FinLocation<-renderPlot({
     z<-ParticipantSavings%>%
       st_as_sf(wkt="currentLocation")
     
-    tmap_mode("plot")
+    
     tm_shape(buildings)+
       tm_polygons(col = "white",
                   border.col = "grey",
@@ -713,23 +765,24 @@ server <- function(input, output){
   #### valueBox #### 
   output$value1 <- renderValueBox({
     valueBox(
-      formatC(NumberOfParicipants$n, format="d", big.mark=',')
-      ,'Total'
+      value=div(NumberOfParicipants$n,style="font-size:16px;")
+      #paste(NumberOfParicipants$n, format="d")
+      ,subtitle = HTML('<b style = "padding-left:0px;font-size:10px">Participants</b>')
       ,icon = icon("stats",lib='glyphicon')
       ,color = "purple")  
   })
   output$value2 <- renderValueBox({ 
     valueBox(
-      formatC("Mar 2022 - May 2023", format="d", big.mark=',')
-      ,'Period'
-      ,icon = icon("gbp",lib='glyphicon')
-      ,color = "green")  
+      value=div(paste("Mar 22-May 23"),style="font-size:16px;")
+      ,subtitle = HTML('<b style = "padding-left:0px;font-size:10px">Period</b>')
+      ,icon = icon("calendar")
+      )  
   })
   output$value3 <- renderValueBox({
     valueBox(
-      formatC("8", format="d", big.mark=',')
-      ,'Interest Groups'
-      ,icon = icon("menu-hamburger",lib='glyphicon')
+      value=div(paste("8"),style="font-size:16px;")
+      ,subtitle = HTML('<b style = "padding-left:0px;font-size:10px">Groups</b>')
+      ,icon = icon("user",lib='glyphicon')
       ,color = "yellow")   
   })
   
@@ -801,7 +854,8 @@ server <- function(input, output){
   output$ExpensesEachMonth <- renderPlot({
     
     
-    ggplot(ParticipantMonthlySavings%>%filter(Month %in% input$Months)) +
+    ggplot(ParticipantMonthlySavings%>%
+             filter(Month %in% input$Months)) +
       geom_density_ridges_gradient(aes(y = haveKids, 
                                        x = Expense,
                                        fill=stat(x)),
@@ -821,20 +875,64 @@ server <- function(input, output){
   
   output$EarningReactableDashboard <- renderReactable({
     
+    if(input$HaveKidsDashboard!="All"){
+      ParticipantMonthlySparkData<-ParticipantMonthlySpark%>%
+        filter(householdSize %in% input$HouseHoldSizeDashboard)%>%
+        filter(haveKids==input$HaveKidsDashboard)%>%
+        filter(age>= input$age[1] & age<=input$age[2])%>%
+        filter(educationLevel %in% input$EducationDashboard)%>%
+        select(participantId,Earning,Expense,joviality)
+    }
+    else{
+      ParticipantMonthlySparkData<-ParticipantMonthlySpark%>%
+        filter(householdSize %in% input$HouseHoldSizeDashboard)%>%
+        filter(age>= input$age[1] & age<=input$age[2])%>%
+        filter(educationLevel %in% input$EducationDashboard)%>%
+        select(participantId,Earning,Expense,joviality)
+    }
+
     
+
     
+    #ParticipantMonthlySparkShared<-SharedData$new(ParticipantMonthlySparkData)
+
+  
+  
     reactable(
-      ParticipantMonthlyEarningSpark,
+      ParticipantMonthlySparkData,
       columns = list(
-        participantId = colDef(maxWidth = 200),
+        participantId = colDef(maxWidth = 120),
         `Earning` = colDef(
-          cell = react_sparkline(ParticipantMonthlyEarningSpark,
+          cell = react_sparkline(ParticipantMonthlySparkData,
                                  highlight_points = highlight_points(
                                    min = "red", max = "blue"),
                                  labels = c("first", "last"))
+        ),
+        `Expense` = colDef(
+          cell = react_sparkline(ParticipantMonthlySparkData,
+                                 highlight_points = highlight_points(
+                                   min = "red", max = "blue"),
+                                 labels = c("first", "last"))
+        ),
+        `joviality` =  colDef(
+          cell = data_bars(
+            data =ParticipantMonthlySparkData,
+            fill_color = viridis::mako(5),
+            background = '#F1F1F1',
+            fill_opacity = 0.8,
+            round_edges = TRUE,
+            text_position = 'outside-end',
+            number_fmt = scales::comma_format(accuracy = 0.001)
+          )
         )
       )
-    )
+    )%>% 
+      add_title(
+        title = 'Are we financially fit?', 
+  
+        align = 'center',
+        font_color = '#000000'
+      )
     
     
     
@@ -842,22 +940,7 @@ server <- function(input, output){
     
   })
   
-  output$ExpenseReactableDashboard <- renderReactable({
-    
-    reactable(
-      ParticipantMonthlyExpenseSpark,
-      columns = list(
-        participantId = colDef(maxWidth = 200),
-        `Expense` = colDef(
-          cell = react_sparkline(ParticipantMonthlyExpenseSpark,
-                                 highlight_points = highlight_points(
-                                   min = "red", max = "blue"),
-                                 labels = c("first", "last"))
-        )
-      )
-    )
-    
-  })
+
   
   
   
@@ -916,8 +999,10 @@ server <- function(input, output){
   
   output$InterestGroups<- renderPlotly({
     
-    ggplotly(a)
     
+    ggplot(InterestGroupGraph%>%
+             filter(interestGroup %in% input$InterestGroup))+
+      geom_line(aes(x=date,y=log(Expense*-1),color=interestGroup))
     
     
     
