@@ -615,8 +615,8 @@ ui <- navbarPage(
                                      box(plotOutput("testPlot")),
                                      box(
                                        width = 8,
-                                       height = 120,
-                                       h4('Insights:')
+                                       height = 120
+                                       
                                        
                                      )
                             ),
@@ -657,7 +657,9 @@ ui <- navbarPage(
                                                                 "Interest Group" = "interestGroup"),
                                                    selected = "educationLevel"
                                        )),
-                                     box(plotOutput("paychangePlot"))
+                                     plotlyOutput("eduPayPlot"),
+                                     plotlyOutput("partPayPlot"),
+                                     verbatimTextOutput("drildownlinfo")
                                          
                                      
                             ),
@@ -1191,11 +1193,12 @@ server <- function(input, output){
   })
   
   output$rainPlotTable <- DT::renderDataTable({
-    input$showData
+    if(input$showData){
     DT::datatable(jobs %>% filter(educationRequirement == input$edu) %>%
                     select(jobId, employerId, hourlyRate, educationRequirement),
                   options= list(pageLength = 10),
                   rownames = FALSE)
+    }
     
   })  
   
@@ -1300,22 +1303,41 @@ server <- function(input, output){
     
   })
   
-  output$paychangePlot <- renderPlot({
+  output$eduPayPlot <- renderPlotly({
     
     switchEmployeesAllDetails$participantId <- as.character(switchEmployeesAllDetails$participantId)
     p1<- ggplot(switchEmployeesAllDetails,
                 aes(x=educationLevel, y=payDiff))+
       geom_bar(stat="identity", aes(fill = payStatus))+
       scale_fill_manual(values=c(`Pay Decrease` ="firebrick1", `Pay Increase` ="steelblue")) +
-      labs(y= 'Pay\n Difference',title="Employee Wage Difference Between Previous and Recent Workplace", x='Participant Id') +
+      labs(y= 'Pay\n Difference',title="Change in Wage by Education Level", x='Education Level') +
       theme(axis.title.y=element_text(angle=0), axis.ticks.x=element_blank(),panel.background = element_blank(),
             axis.line = element_line(color='grey'), plot.title = element_text(hjust = 0.5),
             axis.title.y.left = element_text(vjust = 0.5), axis.text = element_text(face="bold")
       )
-   p1
-    
+   ggplotly(p1)
+  
   })
   
+  output$partPayPlot <- renderPlotly({
+    d <- event_data("plotly_click")
+    if (is.null(d)) return(NULL)
+    p2 <- switchEmployeesAllDetails %>% 
+      filter(educationLevel %in% d$x) %>%
+      ggplot(aes(x=haveKids, y=payDiff))+
+      geom_bar(stat="identity", aes(fill = payStatus))+
+      scale_fill_manual(values=c(`Pay Decrease` ="firebrick1", `Pay Increase` ="steelblue")) +
+      labs(y= 'Pay\n Difference',title="Change in Wage by Kids", x='Having Kids') +
+      theme(axis.title.y=element_text(angle=0), axis.ticks.x=element_blank(),panel.background = element_blank(),
+            axis.line = element_line(color='grey'), plot.title = element_text(hjust = 0.5),
+            axis.title.y.left = element_text(vjust = 0.5), axis.text = element_text(face="bold")
+      ) 
+    ggplotly(p2) %>%
+      layout(xaxis = list(title = d$x))
+  })
+  output$drildownlinfo <- renderPrint({
+    event_data("plotly_click")
+  }) 
 }
 
 shinyApp(ui = ui, server = server)
