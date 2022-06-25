@@ -7,6 +7,8 @@ navbar:
   left: 
     - text: "Project Proposal"
       href: proposal.html
+    - text: "Poster"
+      href: Wealth Check Up/Wealth-Check-Up.html
   right:
     - text: "home"
       href: index.html
