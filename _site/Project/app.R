@@ -24,27 +24,17 @@ ParticipantsApartmentLocation<-read_csv("data/ParticipantsApartmentLocation.csv"
 buildings<-read_sf("data/buildings.csv", 
                    options = "GEOM_POSSIBLE_NAMES=location")
 
-################################# Reading rds files ##########################################
+jobs <- read_csv("data/Jobs.csv")
+emp <- read_csv("data/Employers.csv")
+travel <- read_csv("data/TravelJournal.csv")
+apartments <- read_csv("data/wkt/Apartments.csv")
+participants <- read_csv("data/Participants.csv")
+buildings <- read_sf("data/wkt/Buildings.csv", 
+                     options = "GEOM_POSSIBLE_NAMES=location")
+employers <- read_sf("data/wkt/Employers.csv", 
+                     options = "GEOM_POSSIBLE_NAMES=location")
+logs_selected <- read_rds("data/logs_selected.rds")
 
-employers <- readRDS('data/Q3/employers.rds')
-empWorkinMultiplePlaces <- readRDS('data/Q3/empWorkinMultiplePlaces.rds')
-empWorkinMultiplePlaces_latest <- readRDS('data/Q3/empWorkinMultiplePlaces_latest.rds')
-empWorkinMultiplePlaces_latest_groupby <- readRDS('data/Q3/empWorkinMultiplePlaces_latest_groupby.rds')
-empWorkinMultiplePlaces_previous <- readRDS('data/Q3/empWorkinMultiplePlaces_previous.rds')
-empWorkinMultiplePlaces_previous_groupby <- readRDS('data/Q3/empWorkinMultiplePlaces_previous_groupby.rds')
-jobs <- readRDS('data/Q3/jobs.rds')
-participants <- readRDS('data/Q3/participants.rds')
-pay_hires <- readRDS('data/Q3/pay_hires.rds')
-prevEmp_sf <- readRDS('data/Q3/prevEmp_sf.rds')
-switchEmployeesAllDetails <- readRDS('data/Q3/switchEmployeesAllDetails.rds')
-transitionEmpDetails <- readRDS('data/Q3/transitionEmpDetails.rds')
-transitionTable <- readRDS('data/Q3/transitionTable.rds')
-work <- readRDS('data/Q3/work.rds')
-work_home <- readRDS('data/Q3/work_home.rds')
-work_home_filt <- readRDS('data/Q3/work_home_filt.rds')
-workinmoreplaces <- readRDS('data/Q3/workinmoreplaces.rds')
-
-#################################### Other Data Wrangling ######################################
 
 
 ########################## Q1 ########################## 
@@ -270,7 +260,115 @@ Ex <- ggplot(data=PShighlighted,
 
 ########################## Q3 ########################## 
 
-########## before and after route map ################
+jobs<-jobs %>%
+  mutate(workinghours=difftime(jobs$endTime,jobs$startTime,units='hours')*5)
+jobs<-jobs %>%
+  mutate(weeklypay=hourlyRate*workinghours)
+jobs$weeklypay=as.numeric(jobs$weeklypay)
+jobs <-jobs %>%
+  mutate(educationRequirement = factor(jobs$educationRequirement, level = c('Low', 'HighSchoolOrCollege','Bachelors','Graduate')))
+
+participants<- participants %>%
+  mutate(jovialityGroup= cut(joviality, breaks =c(-Inf,0.2,0.5,0.8,1),labels=c("Not too Happy","Fairly Happy","Happy","Very Happy"))) %>%
+  mutate(ageGroup = cut(age,breaks=c(18,35,55,Inf),labels=c("Young Adult","Middle Age","Older Adult"),
+                        include.lowest = TRUE))
+
+hires <- jobs %>%
+  group_by(employerId) %>% tally() %>%
+  arrange(desc(n)) %>%
+  dplyr::rename("No. of employees" = "n")
+
+employerpay <- jobs %>%
+  group_by(employerId) %>%
+  dplyr::summarise(emppay = sum(weeklypay))
+
+pay_hires <- merge(x = hires, y = employerpay, by = "employerId", all = TRUE) %>%
+  mutate(employeepay = emppay / `No. of employees`) %>%
+  arrange(desc(employeepay)) %>%
+  dplyr::select(employerId,`No. of employees`, employeepay) %>%
+  arrange(employerId)
+pay_hires
+
+
+work_home <- travel %>%
+  filter(purpose == "Work/Home Commute") %>%
+  group_by(participantId,travelEndLocationId) %>%
+  tally() %>%
+  dplyr::select('participantId','travelEndLocationId') 
+
+work <- inner_join(x = work_home, y = emp, by= c("travelEndLocationId"="employerId" )) %>%
+  dplyr::select('participantId','travelEndLocationId') %>%
+  group_by(participantId) %>%
+  tally() %>%
+  dplyr::rename('numberofplacesworked'='n')
+
+workinmoreplaces <- work %>%
+  filter(numberofplacesworked > 1) %>%
+  arrange(participantId)
+
+work_home_filt <- travel %>%
+  filter(purpose == "Work/Home Commute") %>%
+  group_by(participantId,travelEndLocationId) %>%
+  tally() %>%
+  dplyr::select('participantId','travelEndLocationId') %>%
+  filter(travelEndLocationId
+         %in% emp$employerId & participantId %in% workinmoreplaces$participantId)
+
+empWorkinMultiplePlaces <- travel %>%
+  mutate(StartDate = as_date(travelStartTime)) %>%
+  filter (participantId %in% work_home_filt$participantId &
+            purpose == "Work/Home Commute" &
+            travelEndLocationId %in% work_home_filt$travelEndLocationId) %>%
+  dplyr::select(participantId,StartDate,travelEndLocationId) %>%
+  arrange(participantId)
+
+empWorkinMultiplePlaces <- empWorkinMultiplePlaces %>%
+  group_by(participantId) %>%
+  filter(StartDate == min(StartDate) | StartDate == max(StartDate)) %>%
+  ungroup
+
+empWorkinMultiplePlaces_latest <- empWorkinMultiplePlaces %>%
+  group_by(participantId) %>%
+  slice(which.max(StartDate)) %>%
+  dplyr::rename ("recent_employer" = "travelEndLocationId")
+
+empWorkinMultiplePlaces_previous <- empWorkinMultiplePlaces %>%
+  group_by(participantId) %>%
+  slice(which.min(StartDate)) %>%
+  dplyr::rename ("previous_employer" = "travelEndLocationId")
+
+empWorkinMultiplePlaces_latest_groupby <- empWorkinMultiplePlaces_latest %>%
+  group_by(recent_employer) %>%
+  tally() %>%
+  dplyr::rename("no.ofempShifted" = "n") %>%
+  arrange(desc(`no.ofempShifted`))
+
+empWorkinMultiplePlaces_previous_groupby <- empWorkinMultiplePlaces_previous %>%
+  group_by(previous_employer) %>%
+  tally() %>%
+  dplyr::rename("no.ofempLeft" = "n") %>%
+  arrange(desc(`no.ofempLeft`))
+
+transitionTable <- inner_join(x=empWorkinMultiplePlaces_previous ,
+                              y=empWorkinMultiplePlaces_latest,
+                              by = "participantId") %>%
+  dplyr::select(participantId,previous_employer,recent_employer)
+transitionEmpDetails <- participants %>%
+  filter(participantId %in% transitionTable$participantId)
+
+employers <- employers %>% 
+  mutate(across(employerId, as.integer))
+
+prevEmp_sf <- employers %>%
+  filter(employerId %in% transitionTable$previous_employer ) %>%
+  mutate(empWorkinMultiplePlaces_previous_groupby$no.ofempLeft) %>%
+  dplyr::rename("no.ofempLeft" = "empWorkinMultiplePlaces_previous_groupby$no.ofempLeft")
+
+recntEmp_sf <- employers %>%
+  filter(employerId %in% transitionTable$recent_employer )%>%
+  mutate(empWorkinMultiplePlaces_latest_groupby$no.ofempShifted) %>%
+  dplyr::rename("no.ofempShifted" = "empWorkinMultiplePlaces_latest_groupby$no.ofempShifted")
+
 
 hex <- st_make_grid(buildings, 
                     cellsize=100, 
@@ -332,17 +430,6 @@ no.ofjobs <- jobs %>%
             avgWage = mean(hourlyRate)) %>%
   dplyr::rename('Average Wage' = 'avgWage') %>%
   mutate(label = paste(no.ofjobs, 'Employees'))
-
-no.ofjobs_table <- jobs %>% 
-  group_by(employerId) %>%
-  summarise(no.ofjobs = n(),
-            totalWage = sum(hourlyRate),
-            avgWage = mean(hourlyRate),
-            eduLevel = educationRequirement) %>%
-  dplyr::rename('Average Wage' = 'avgWage') %>%
-  mutate(label = paste(no.ofjobs, 'Employees')) %>%
-  dplyr::select(employerId, no.ofjobs, `Average Wage`, eduLevel)
-
 
 ################### difference in wage bar plot ###################
 
@@ -646,14 +733,12 @@ ui <- navbarPage(
                                                                  "Light -Dark Blue" = "Blues"),
                                                      selected = "RdYlBu"),
                                          sliderInput(inputId = "no.ofemp",
-                                                     label = "Choose min. and max. no. of employees",
+                                                     label = "No. of Employees",
                                                      min = 2,
                                                      max = 9,
-                                                     value= c(3,7))
+                                                     value= 4)
                                        ),
-                                       box(plotOutput("treemapPlot")),
-                                       DT::dataTableOutput(outputId = "treemapTable")
-                                                           
+                                       box(plotOutput("treemapPlot"))
                                        
                                        
                               ),
@@ -1129,7 +1214,6 @@ server <- function(input, output){
                     border.col = "black",
                     border.lwd = 1)+
         tm_shape(prevEmp_sf) +
-        tm_compass()+
         tm_bubbles(col = "red",
                    n=3,
                    size = "no.ofempLeft") 
@@ -1143,7 +1227,6 @@ server <- function(input, output){
                     border.col = "black",
                     border.lwd = 1)+
         tm_shape(recntEmp_sf) +
-        tm_compass()+
         tm_bubbles(col = "green",
                    size = "no.ofempShifted") 
     }
@@ -1181,7 +1264,6 @@ server <- function(input, output){
                   border.lwd = 1) +
       tm_shape(logs_path_PrevJob) +
       tm_lines(col = "red") +
-      tm_compass()+
       tm_layout(main.title = "Previous Job Route",
                 main.title.position = "center",
                 main.title.size = 1,
@@ -1202,7 +1284,6 @@ server <- function(input, output){
                   border.lwd = 1) +
       tm_shape(logs_path_RecJob) +
       tm_lines(col = "red") +
-      tm_compass()+
       tm_layout(main.title = "Latest Job Route",
                 main.title.position = "center",
                 main.title.size = 1,
@@ -1211,33 +1292,16 @@ server <- function(input, output){
     
   })
   
-  
-  output$treemapPlot <- renderPlot ({
-                  treemap(no.ofjobs %>% 
-                            filter(no.ofjobs >= input$no.ofemp[1] &
-                                     no.ofjobs <= input$no.ofemp[2]),
-                         index = c('label', 'employerId'),
-                         vSize = 'totalWage',
-                         vColor = 'Average Wage',
-                         palette = input$color,
-                         type = 'value',
-                         title = 'Wage by Employer')
+  output$treemapPlot <- renderPlot({
+    treemap(no.ofjobs %>% filter(no.ofjobs == input$no.ofemp),
+            index = c('label', 'employerId'),
+            vSize = 'totalWage',
+            vColor = 'Average Wage',
+            palette = input$color,
+            type = 'value',
+            title = 'Wage by Employer')
     
-                    rootname = 'Employee Hourly Wage by Workplace'
-                  })
-  output$treemapTable <- DT::renderDataTable({
-    if(input$showData){
-      DT::datatable(no.ofjobs_table %>% 
-                      filter(no.ofjobs >= input$no.ofemp[1] &
-                               no.ofjobs <= input$no.ofemp[2]),
-                    caption = "Is the high wage due to educational qualification ?",
-                    options= list(pageLength = 10),
-                    rownames = FALSE)
-    }
-    
-  })  
-  
-    
+  })
   
   output$eduPayPlot <- renderPlotly({
     
