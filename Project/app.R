@@ -19,7 +19,7 @@ library(shiny)
 ########################## Reading the files ########################## 
 
 # FinancialJournal<-read_csv("data/FinancialJournal.csv",show_col_types = FALSE)
-# Participants<-read_csv("data/Participants.csv",show_col_types = FALSE)
+Participants<-read_csv("data/Participants.csv",show_col_types = FALSE)
 ParticipantsApartmentLocation<-read_csv("data/ParticipantsApartmentLocation.csv",show_col_types = FALSE)
 buildings<-read_sf("data/buildings.csv", 
                    options = "GEOM_POSSIBLE_NAMES=location")
