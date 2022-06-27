@@ -291,12 +291,12 @@ hex <- st_make_grid(buildings,
   st_sf() %>%
   rowid_to_column('hex_id')
 points_in_hex <- sf::st_join(logs_selected, 
-                         hex, 
-                         join=st_within)
+                             hex, 
+                             join=st_within)
 
 points_in_hex <- sf::st_join(logs_selected, 
-                         hex, 
-                         join=st_within) %>%
+                             hex, 
+                             join=st_within) %>%
   st_set_geometry(NULL) %>%
   dplyr::count(name='pointCount', hex_id)
 
@@ -427,9 +427,9 @@ ui <- navbarPage(
                         column(4,selectInput(inputId = "EducationDashboard", 
                                              label =   "Education Qualification",
                                              choices =  c("Low"="Low",
-                                               "High School or College"="HighSchoolOrCollege",
+                                                          "High School or College"="HighSchoolOrCollege",
                                                           "Bachelors"="Bachelors",
-                                               "Graduate"="Graduate"),
+                                                          "Graduate"="Graduate"),
                                              multiple = TRUE,
                                              selected = c("Low",
                                                           "HighSchoolOrCollege",
@@ -437,58 +437,107 @@ ui <- navbarPage(
                                                           "Graduate")
                         ))
                         
-                               
-                               
+                        
+                        
                         
                         
                       ),
                       
                       fluidRow(
                         column(3,sliderInput("age", "Age:",
-                                           min = min(participants$age), max = max(participants$age),
-                                           value = c(min(participants$age),max(participants$age))))),
+                                             min = min(participants$age), max = max(participants$age),
+                                             value = c(min(participants$age),max(participants$age))))),
                       
                       fluidRow(
                         column(12,reactableOutput("EarningReactableDashboard", 
-                                                 width = "auto", 
-                                                 height = "auto", 
-                                                 inline = FALSE))
-                      ),
-                      fluidRow(
-                        column(3,checkboxGroupInput("category", "Variables to show:",
-                                                    c("Education" = "Education",
-                                                      "Food" = "Food",
-                                                      "Recreation" = "Recreation",
-                                                      "Shelter" = "Shelter"),
-                                                    selected = "Education")),
-                        column(9,plotlyOutput("ExpensesTrellis"))
-                        
-                      ),
+                                                  width = "auto", 
+                                                  height = "auto", 
+                                                  inline = FALSE))
+                      )),
+             tabPanel("Q2.2",
                       
-                      fluidRow(
-                        column(3,checkboxGroupInput("Months", "Variables to show:",
-                                                    c("Nov 22" = "Nov 22",
-                                                      "Dec 22" = "Dec 22",
-                                                      "Jan 23" = "Jan 23",
-                                                      "Feb 23" = "Feb 23"),
-                                                    selected = "Nov 22")),
-                        column(9,plotOutput("ExpensesEachMonth"))
-                      ),
+                      
+                      
+                      
+                      
+                      
                       
                       
                       fluidRow(
-                        column(12,plotOutput("FinLocation")),
-                        
-                        
+                        column(3,checkboxGroupInput("Lorenz", "Variables to show:",
+                                                    c("Earning" = "TotalEarning",
+                                                      "Expense" = "TotalExpense"),
+                                                    selected = "TotalEarning")),
+                        column(9,plotlyOutput("LorenzCurve"))
                         
                       ),
                       fluidRow(
-                        column(6,plotOutput("HeatMap")),
-                        column(6,plotlyOutput("CandleStickGraph"))
+                        column(3,selectInput(inputId = "yaxis", 
+                                             label =   "Select the comparison",
+                                             choices =  c("Kids" = "haveKids",
+                                                          "HouseholdSize" = "householdSize",
+                                                          "Education Level" = "educationLevel"),
+                                             selected = "haveKids"
+                        )),
+                        column(3,selectInput(inputId = "categorySelected", 
+                                             label =   "Select the Category",
+                                             c("Education" = "Education",
+                                               "Food" = "Food",
+                                               "Recreation" = "Recreation",
+                                               "Shelter" = "Shelter"),
+                                             multiple=TRUE,
+                                             selected = "Food")),
+                        column(3,selectInput(inputId = "Week", 
+                                             label =   "Select the Week",
+                                             c("Monday"="Monday","Tuesday"="Tuesday",
+                                               "Wednesday"="Wednesday","Thursday"="Thursday",
+                                               "Friday"="Friday","Saturday"="Saturday","Sunday"="Sunday"),
+                                             multiple=TRUE,
+                                             selected = c("Monday","Tuesday",
+                                                          "Wednesday","Thursday",
+                                                          "Friday","Saturday","Sunday"))),
                         
-                        
+                        column(3,selectInput(inputId = "Months", 
+                                             label =   "Select the Month",
+                                             c("Nov 2022" = "Nov 2022",
+                                               "Dec 2022" = "Dec 2022",
+                                               "Jan 2023" = "Jan 2023",
+                                               "Feb 2023" = "Feb 2023"),
+                                             multiple=TRUE,
+                                             selected = "Nov 2022"))
                       ),
-
+                      
+                      
+                      # fluidRow(
+                      #   column(3,checkboxGroupInput("category", "Categories:",
+                      #                               c("Education" = "Education",
+                      #                                 "Food" = "Food",
+                      #                                 "Recreation" = "Recreation",
+                      #                                 "Shelter" = "Shelter"),
+                      #                               selected = "Education")),
+                      #   column(9,plotlyOutput("ExpensesTrellis"))
+                      #   
+                      # ),
+                      fluidRow(
+                        column(12,reactableOutput("WagesExpenseDashboard", 
+                                                  width = "auto", 
+                                                  height = "auto", 
+                                                  inline = FALSE))
+                      ),
+                      fluidRow(
+                        column(6,plotOutput("ExpensesEachMonth")),
+                        column(6,plotOutput("HeatMap"))
+                      ),
+                      
+                      
+                      # fluidRow(
+                      #   column(12,plotOutput("FinLocation")),
+                      
+                      
+                      
+                      
+                      
+                      
                       #mainPanel(
                       #  uiOutput("CoordinatedPlot"),
                       #  width = "100%", height = "400px"
@@ -504,11 +553,11 @@ ui <- navbarPage(
                       fluidRow(
                         column(3,
                                checkboxGroupInput("InterestGroup", "Interest Group",
-                                                    c("A" = "A",
-                                                      "B" = "B",
-                                                      "C" = "C",
-                                                      "D" = "D"),
-                                                    selected = "A")),
+                                                  c("A" = "A",
+                                                    "B" = "B",
+                                                    "C" = "C",
+                                                    "D" = "D"),
+                                                  selected = "A")),
                         
                         
                         column(9,plotlyOutput("InterestGroups")))
@@ -517,85 +566,85 @@ ui <- navbarPage(
              )
              
   ),
-             
+  
   navbarMenu("Employment & Turnover",
              tabPanel("Turnover Analysis",
                       fluidPage(
-                      titlePanel("What is the impact of job switch among participants ?"),
-                      fluidRow(
-                        column(
-                          width = 12,
-                          height = 100,
-                          tabsetPanel(
-                            tabPanel("One Sample Test ",
-                                     box(
-                                       width = 4,
-                                       height = 60,
-                                       selectInput(inputId = "variable_selection", 
-                                                   label =   "Type of test:",
-                                                   choices =  c("Parametric" = "parametric",
-                                                                "Non Parametric" = "nonparametric",
-                                                                "Robust" = "robust"),
-                                                   selected = "Parametric"
-                                       )),
-                                     box(plotOutput("testPlot")),
-                                     box(
-                                       width = 8,
-                                       height = 120
-                                       
-                                       
-                                     )
-                            ),
-                            tabPanel("Job Route",
-                                     box(
-                                       width = 20,
-                                       height = 100,
-                                       selectInput(inputId = "participants",
-                                                   label = "Select Participant Id",
-                                                   choices = partid,
-                                                   selected = c(partid[5]))
-                                       
-                                     ),
-                                     fluidRow(
-                                       box("Commute route from home to work before job change",
-                                           plotOutput(outputId = "befRoute",
-                                                      width = 500,
-                                                      height = 500),
-                                       ),
-                                       box("Commute route from home to work after job change",
-                                           plotOutput(outputId  = "aftRoute",
-                                                      width = 500,
-                                                      height = 500)
-                                       )
-                                     )
-                                     
-                                     
-                            ),
-                            tabPanel("Change of Wage",
-                                     box(
-                                       width = 4,
-                                       height = 60,
-                                       checkboxGroupInput(inputId = "groupbyCategory", 
-                                                   label =   "Choose Category :",
-                                                   choices =  c("Education Level" = "educationLevel",
-                                                                "Household Size" = "householdSize",
-                                                                "Having Kids" = "haveKids",
-                                                                "Interest Group" = "interestGroup"),
-                                                   selected = "educationLevel"
-                                       )),
-                                     plotlyOutput("eduPayPlot"),
-                                     plotlyOutput("partPayPlot"),
-                                     verbatimTextOutput("drildownlinfo")
+                        titlePanel("What is the impact of job switch among participants ?"),
+                        fluidRow(
+                          column(
+                            width = 12,
+                            height = 100,
+                            tabsetPanel(
+                              tabPanel("One Sample Test ",
+                                       box(
+                                         width = 4,
+                                         height = 60,
+                                         selectInput(inputId = "variable_selection", 
+                                                     label =   "Type of test:",
+                                                     choices =  c("Parametric" = "parametric",
+                                                                  "Non Parametric" = "nonparametric",
+                                                                  "Robust" = "robust"),
+                                                     selected = "Parametric"
+                                         )),
+                                       box(plotOutput("testPlot")),
+                                       box(
+                                         width = 8,
+                                         height = 120
                                          
-                                     
-                            ),
-                            
-                            
+                                         
+                                       )
+                              ),
+                              tabPanel("Job Route",
+                                       box(
+                                         width = 20,
+                                         height = 100,
+                                         selectInput(inputId = "participants",
+                                                     label = "Select Participant Id",
+                                                     choices = partid,
+                                                     selected = c(partid[5]))
+                                         
+                                       ),
+                                       fluidRow(
+                                         box("Commute route from home to work before job change",
+                                             plotOutput(outputId = "befRoute",
+                                                        width = 500,
+                                                        height = 500),
+                                         ),
+                                         box("Commute route from home to work after job change",
+                                             plotOutput(outputId  = "aftRoute",
+                                                        width = 500,
+                                                        height = 500)
+                                         )
+                                       )
+                                       
+                                       
+                              ),
+                              tabPanel("Change of Wage",
+                                       box(
+                                         width = 4,
+                                         height = 60,
+                                         checkboxGroupInput(inputId = "groupbyCategory", 
+                                                            label =   "Choose Category :",
+                                                            choices =  c("Education Level" = "educationLevel",
+                                                                         "Household Size" = "householdSize",
+                                                                         "Having Kids" = "haveKids",
+                                                                         "Interest Group" = "interestGroup"),
+                                                            selected = "educationLevel"
+                                         )),
+                                       plotlyOutput("eduPayPlot"),
+                                       plotlyOutput("partPayPlot"),
+                                       verbatimTextOutput("drildownlinfo")
+                                       
+                                       
+                              ),
+                              
+                              
+                            )
                           )
                         )
                       )
-                    )
-                 ),
+             ),
              tabPanel("Employment Pattern",
                       fluidPage(
                         titlePanel("What is the pattern found in the employment ?"),
@@ -666,7 +715,7 @@ ui <- navbarPage(
                                        ),
                                        box(plotOutput("treemapPlot")),
                                        DT::dataTableOutput(outputId = "treemapTable")
-                                                           
+                                       
                                        
                                        
                               ),
@@ -755,7 +804,7 @@ server <- function(input, output){
       value=div(paste("Mar 22-May 23"),style="font-size:16px;")
       ,subtitle = HTML('<b style = "padding-left:0px;font-size:10px">Period</b>')
       ,icon = icon("calendar")
-      )  
+    )  
   })
   output$value3 <- renderValueBox({
     valueBox(
@@ -801,22 +850,74 @@ server <- function(input, output){
   ### Time series ###
   output$ExpensesEachMonth <- renderPlot({
     
+    if(input$yaxis=="haveKids"){
+      ggplot(StatusLogDetails%>%
+               filter(Month %in% input$Months)%>%
+               filter(Weekday %in% input$Week)%>%
+               filter(category %in% input$categorySelected)) +
+        geom_density_ridges_gradient(aes(y = haveKids, 
+                                         x = TotalAmount,
+                                         fill=stat(x),
+                                         height=..density..),
+                                     scale = 1,
+                                     stat="density",
+                                     rel_min_height = 0.01,
+                                     bandwidth=80)+
+        scale_fill_viridis_c(name = "Amount", option = "C")+
+        xlab("Amount")+
+        ylab("Kids")+
+        facet_grid(~Month)+
+        ggtitle("Expenses during the On vs Off season")+
+        labs(caption="Source: https://r-graph-gallery.com/ridgeline-plot.html")+
+        theme(axis.title.y=element_text(angle=0))
+      
+    }
     
-    ggplot(ParticipantMonthlySavings%>%
-             filter(Month %in% input$Months)) +
-      geom_density_ridges_gradient(aes(y = haveKids, 
-                                       x = Expense,
-                                       fill=stat(x)),
-                                   scale = 1, 
-                                   rel_min_height = 0.01,
-                                   bandwidth=80)+
-      scale_fill_viridis_c(name = "Amount", option = "C")+
-      xlab("Amount")+
-      ylab("Kids")+
-      facet_grid(~Month)+
-      ggtitle("Expenses during the On vs Off season")+
-      labs(caption="Source: https://r-graph-gallery.com/ridgeline-plot.html")+
-      theme(axis.title.y=element_text(angle=0))
+    else if(input$yaxis=="householdSize"){
+      ggplot(StatusLogDetails%>%
+               filter(Month %in% input$Months)%>%
+               filter(Weekday %in% input$Week)%>%
+               filter(category %in% input$categorySelected)) +
+        geom_density_ridges_gradient(aes(y = householdSize, 
+                                         x = TotalAmount,
+                                         fill=stat(x),
+                                         height=..density..),
+                                     scale = 1,
+                                     stat="density",
+                                     rel_min_height = 0.01,
+                                     bandwidth=80)+
+        scale_fill_viridis_c(name = "Amount", option = "C")+
+        xlab("Amount")+
+        ylab("Household Size")+
+        facet_grid(~Month)+
+        ggtitle("Expenses during the On vs Off season")+
+        labs(caption="Source: https://r-graph-gallery.com/ridgeline-plot.html")+
+        theme(axis.title.y=element_text(angle=0))
+      
+    }
+    
+    else if(input$yaxis=="educationLevel"){
+      ggplot(StatusLogDetails%>%
+               filter(Month %in% input$Months)%>%
+               filter(Weekday %in% input$Week)%>%
+               filter(category %in% input$categorySelected)) +
+        geom_density_ridges_gradient(aes(y = educationLevel, 
+                                         x = TotalAmount,
+                                         fill=stat(x),
+                                         height=..density..),
+                                     scale = 1,
+                                     stat="density",
+                                     rel_min_height = 0.01,
+                                     bandwidth=80)+
+        scale_fill_viridis_c(name = "Amount", option = "C")+
+        xlab("Amount")+
+        ylab("Education Level")+
+        facet_grid(~Month)+
+        ggtitle("Expenses during the On vs Off season")+
+        labs(caption="Source: https://r-graph-gallery.com/ridgeline-plot.html")+
+        theme(axis.title.y=element_text(angle=0))
+      
+    }
     
   })
   
@@ -838,14 +939,14 @@ server <- function(input, output){
         filter(educationLevel %in% input$EducationDashboard)%>%
         select(participantId,Earning,Expense,joviality)
     }
-
     
-
+    
+    
     
     #ParticipantMonthlySparkShared<-SharedData$new(ParticipantMonthlySparkData)
-
-  
-  
+    
+    
+    
     reactable(
       ParticipantMonthlySparkData,
       columns = list(
@@ -877,7 +978,7 @@ server <- function(input, output){
     )%>% 
       add_title(
         title = 'Are we financially fit?', 
-  
+        
         align = 'center',
         font_color = '#000000'
       )
@@ -888,7 +989,75 @@ server <- function(input, output){
     
   })
   
-
+  output$WagesExpenseDashboard <- renderReactable({
+    
+    
+    
+    
+    
+    #ParticipantMonthlySparkShared<-SharedData$new(ParticipantMonthlySparkData)
+    
+    StatusLogDetailsExpenseData<-StatusLogDetails%>%
+      filter(Month %in% input$Months)%>%
+      filter(Weekday %in% input$Week)%>%
+      filter(category %in% input$categorySelected)%>%
+      group_by(participantId)%>%
+      summarise(Expense=sum(TotalAmount)*-1)
+    
+    StatusLogDetailsEarningData<-StatusLogDetails%>%
+      filter(Month %in% input$Months)%>%
+      filter(Weekday %in% input$Week)%>%
+      filter(category =="Wage")%>%
+      group_by(participantId)%>%
+      summarise(Earn=sum(TotalAmount)*-1)
+    StatusLogDetailseData<-left_join(y=StatusLogDetailsExpenseData,
+                                     x=StatusLogDetailsEarningData,
+                                     by=c("participantId"="participantId"))
+    reactable(
+      StatusLogDetailseData,
+      columns = list(
+        participantId = colDef(maxWidth = 120),
+        `Earn` = colDef(
+          name = 'Wage',
+          minWidth = 150,
+          align = 'center',
+          cell = data_bars(
+            data = StatusLogDetailseData,
+            text_position = 'outside-end',
+            fill_color = viridis::mako(5),
+            number_fmt = scales::number_format(accuracy = 0.01)
+          )
+        ),
+        `Expense` = colDef(
+          name = 'Expense',
+          minWidth = 150,
+          align = 'center',
+          cell = data_bars(
+            data = StatusLogDetailseData,
+            text_position = 'outside-end',
+            fill_color = viridis::mako(5),
+            number_fmt = scales::number_format(accuracy = 0.01)
+          )
+          
+        )
+      )
+    )%>% 
+      add_title(
+        title = 'Are we financially fit?', 
+        
+        align = 'center',
+        font_color = '#000000'
+      )
+    
+    
+    
+    
+    
+  })
+  
+  
+  
+  
   
   
   
@@ -922,33 +1091,56 @@ server <- function(input, output){
   output$HeatMap<- renderPlot({
     
     ggplot(StatusLogDetails%>%
+             filter(category %in% input$categorySelected)%>%
+             filter(Weekday %in% input$Week)%>%
              group_by(participantId,Weekday,category)%>%
-            summarise(Expense=sum(TotalAmount)),
-          aes(x=factor(Weekday,levels=c("Monday","Tuesday",
-                                        "Wednesday","Thursday",
-                                        "Friday","Saturday","Sunday")),
-              category,
-              fill = Expense)) +
-     geom_tile(aes(text=paste("Total Time: ",Expense)),color = "white",
-               size = 0.1,lwd = 1.5,linetype = 1) +
-     coord_equal() +
-     scale_fill_gradient2(low = "#075AFF",
-                          mid = "#FFFFCC",
-                          high = "#FF0000")+
-     labs(x = NULL,
-          y = NULL,
-          title = "Is it all work and no play?")+
-     theme_ipsum()+
-     guides(fill = guide_colourbar(barwidth = 0.5,
-                                   barheight = 5))+
-     theme(axis.ticks = element_blank(),
-           axis.text.x = element_text(size = 7,angle=90),
-           axis.text.y = element_text(size = 7),
-           plot.title = element_text(hjust = 0.5),
-           legend.title = element_text(size = 8),
-           legend.text = element_text(size = 6))
+             summarise(Expense=sum(TotalAmount)),
+           aes(x=Weekday,
+               category,
+               fill = Expense)) +
+      geom_tile(aes(text=paste("Total Time: ",Expense)),color = "white",
+                size = 0.1,lwd = 1.5,linetype = 1) +
+      coord_equal() +
+      scale_fill_gradient2(low = "#075AFF",
+                           mid = "#FFFFCC",
+                           high = "#FF0000")+
+      labs(x = NULL,
+           y = NULL,
+           title = "Is it all work and no play?")+
+      theme_ipsum()+
+      guides(fill = guide_colourbar(barwidth = 0.5,
+                                    barheight = 5))+
+      theme(axis.ticks = element_blank(),
+            axis.text.x = element_text(size = 10,angle=90),
+            axis.text.y = element_text(size = 10),
+            plot.title = element_text(hjust = 0.5),
+            legend.title = element_text(size = 8),
+            legend.text = element_text(size = 6))
     
     
+  })
+  
+  output$LorenzCurve<-renderPlotly({
+    
+    lorenz<-ggplot(ParticipantSavings%>%
+                     select(participantId,
+                            input$Lorenz)%>%
+                     pivot_longer(-1)) +
+      stat_lorenz(aes(value,color=name),
+                  show.legend = FALSE)+
+      coord_fixed()+
+      theme_minimal()+
+      theme(legend.title= element_blank())+
+      ggtitle("Inequality amongst participants")+
+      geom_abline(linetype = "dashed")+
+      xlab("Cummulative Percentage of Participants")+
+      ylab("Cummulative Percentage of Amount")+
+      scale_color_manual(values=c('darkgreen','blue'))+
+      labs(caption="Source: https://www.investopedia.com/terms/l/lorenz-curve.asp")
+    
+    #scale_color_manual(labels = c("Earnings", "Savings","Expense"))+
+    
+    ggplotly(lorenz)
   })
   
   ########################## Q3 ########################## 
@@ -1052,10 +1244,10 @@ server <- function(input, output){
   
   output$rainPlotTable <- DT::renderDataTable({
     if(input$showData){
-    DT::datatable(jobs %>% filter(educationRequirement == input$edu) %>%
-                    select(jobId, employerId, hourlyRate, educationRequirement),
-                  options= list(pageLength = 10),
-                  rownames = FALSE)
+      DT::datatable(jobs %>% filter(educationRequirement == input$edu) %>%
+                      select(jobId, employerId, hourlyRate, educationRequirement),
+                    options= list(pageLength = 10),
+                    rownames = FALSE)
     }
     
   })  
@@ -1156,18 +1348,18 @@ server <- function(input, output){
   
   
   output$treemapPlot <- renderPlot ({
-                  treemap(no.ofjobs %>% 
-                            filter(no.ofjobs >= input$no.ofemp[1] &
-                                     no.ofjobs <= input$no.ofemp[2]),
-                         index = c('label', 'employerId'),
-                         vSize = 'totalWage',
-                         vColor = 'Average Wage',
-                         palette = input$color,
-                         type = 'value',
-                         title = 'Wage by Employer')
+    treemap(no.ofjobs %>% 
+              filter(no.ofjobs >= input$no.ofemp[1] &
+                       no.ofjobs <= input$no.ofemp[2]),
+            index = c('label', 'employerId'),
+            vSize = 'totalWage',
+            vColor = 'Average Wage',
+            palette = input$color,
+            type = 'value',
+            title = 'Wage by Employer')
     
-                    rootname = 'Employee Hourly Wage by Workplace'
-                  })
+    rootname = 'Employee Hourly Wage by Workplace'
+  })
   output$treemapTable <- DT::renderDataTable({
     if(input$showData){
       DT::datatable(no.ofjobs_table %>% 
@@ -1180,7 +1372,7 @@ server <- function(input, output){
     
   })  
   
-    
+  
   
   output$eduPayPlot <- renderPlotly({
     
@@ -1194,8 +1386,8 @@ server <- function(input, output){
             axis.line = element_line(color='grey'), plot.title = element_text(hjust = 0.5),
             axis.title.y.left = element_text(vjust = 0.5), axis.text = element_text(face="bold")
       )
-   ggplotly(p1)
-  
+    ggplotly(p1)
+    
   })
   
   output$partPayPlot <- renderPlotly({
