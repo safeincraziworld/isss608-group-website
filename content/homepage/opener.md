@@ -3,9 +3,9 @@ title: "Welcome"
 weight: 1
 ---
 
-Welcome to the team's website on works done for ISSS608 Group Project: 
+Welcome to the team's website for ISSS608 Group Project on [Vast Challenge 2022](https://vast-challenge.github.io/2022/) 
 Challenge 3: Economic considers the financial health of the city.
- Over time, are businesses growing or shrinking? How are people changing jobs? Are standards of living improving or declining over time?
+Over time, are businesses growing or shrinking? How are people changing jobs? Are standards of living improving or declining over time?
 Considering the financial status of Engagement’s businesses and residents, this site addresses these questions using visual analytic techniques
 
 1. Over the period covered by the dataset, which businesses appear to be more prosperous? Which appear to be struggling? 
