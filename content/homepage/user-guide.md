@@ -9,4 +9,4 @@ weight: 5
 header_menu: true
 ---
 
-This [userguide](https://shinycoin.netlify.app/doc/userguide/index.pdf) acts as a step by step manual of our application
+This [userguide](https://github.com/safeincraziworld/isss608-group-shiny/blob/master/group-shiny/www/UserGuide.pdf) acts as a step by step manual of our application
