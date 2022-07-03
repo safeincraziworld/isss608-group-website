@@ -9,4 +9,4 @@ weight: 5
 header_menu: true
 ---
 
-This [userguide](https://isss608-ay2021-22april.netlify.app/lesson/Lesson01/Lesson01a-Choosing-the-Right-Visualisation.pdf) acts as a step by step manual of our application
+This [userguide](https://shinycoin.netlify.app/doc/userguide/index.pdf) acts as a step by step manual of our application

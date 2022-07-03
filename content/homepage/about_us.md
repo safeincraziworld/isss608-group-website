@@ -9,8 +9,8 @@ weight: 5
 header_menu: true
 ---
 
-![](images/leslie.png)  |  ![](images/raunak.png)  |  ![](images/raveena.png)
-:-------------------------:|:-------------------------:|:-------------------------:
+![](images/leslie.png) |                ![](images/raunak.png)                   |  ![](images/raveena.png)
+:---------------------------:|:-------------------------:|:-------------------------:
 Leslie Long Nu             |  Raunak Kapur             |  Raveena Chakrapani 
 {{<icon class="fa fa-envelope">}}&nbsp;[nu.long.2021@mitb.smu.edu.sg](mailto:your-email@your-domain.com) |        {{<icon class="fa fa-envelope">}}&nbsp;[raunakk.2021@mitb.smu.edu.sg](mailto:your-email@your-domain.com) |        {{<icon class="fa fa-envelope">}}&nbsp;[raveenac.2021@mitb.smu.edu.sg](mailto:your-email@your-domain.com)
 {{<icon class="fa fa-phone">}}&nbsp;[+65 94214808](tel:+491111555555)                                    |        {{<icon class="fa fa-phone">}}&nbsp;[+65 85751387](tel:+491111555555)                                    |        {{<icon class="fa fa-phone">}}&nbsp;[+65 90373705](tel:+491111555555)
